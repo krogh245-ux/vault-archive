@@ -3,791 +3,1472 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VAULT // ARCHIVE — Personal Rotation & Haul Catalog</title>
-  <!-- Load Tailwind CSS -->
+  <title>VAULT // ARCHIVE — Wardrobe, Haul & Fit Catalog</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Inter & Space Grotesk -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            display: ['Space Grotesk', 'sans-serif'],
-          },
-          colors: {
-            obsidian: '#0a0a0c',
-            card: '#121216',
-            cardHover: '#19191f',
-            borderDark: '#24242c',
-            crimson: '#e11d48',
-            crimsonDark: '#be123c',
-          }
-        }
-      }
-    };
-  </script>
   <style>
-    /* Custom scrollbar and subtle chrome/Y2K styling */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+    :root {
+      --bg-main: #09090b;
+      --bg-card: #121216;
+      --bg-card-hover: #18181e;
+      --bg-elevated: #1e1e26;
+      --border-color: #272732;
+      --accent: #e11d48;
+      --accent-hover: #be123c;
+      --accent-soft: rgba(225, 29, 72, 0.16);
+      --accent-border: rgba(225, 29, 72, 0.35);
+      --text-primary: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --title-grad-start: #ffffff;
+      --title-grad-end: #a1a1aa;
     }
-    ::-webkit-scrollbar-track {
-      background: #0a0a0c;
+
+    /* Theme 1: Crimson Dark */
+    [data-theme="crimson-dark"] {
+      --bg-main: #09090b;
+      --bg-card: #121216;
+      --bg-card-hover: #18181e;
+      --bg-elevated: #1e1e26;
+      --border-color: #272732;
+      --accent: #e11d48;
+      --accent-hover: #be123c;
+      --accent-soft: rgba(225, 29, 72, 0.16);
+      --accent-border: rgba(225, 29, 72, 0.35);
+      --text-primary: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --title-grad-start: #ffffff;
+      --title-grad-end: #fda4af;
     }
-    ::-webkit-scrollbar-thumb {
-      background: #272730;
-      border-radius: 9999px;
+
+    /* Theme 2: Silver Frost */
+    [data-theme="silver-frost"] {
+      --bg-main: #0b0e14;
+      --bg-card: #131822;
+      --bg-card-hover: #1a212e;
+      --bg-elevated: #212a3b;
+      --border-color: #2b364a;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --accent-border: rgba(56, 189, 248, 0.35);
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #64748b;
+      --title-grad-start: #ffffff;
+      --title-grad-end: #bae6fd;
     }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #e11d48;
+
+    /* Theme 3: Midnight Pink */
+    [data-theme="midnight-pink"] {
+      --bg-main: #0a070f;
+      --bg-card: #140f1d;
+      --bg-card-hover: #1d1629;
+      --bg-elevated: #261d36;
+      --border-color: #34274a;
+      --accent: #ec4899;
+      --accent-hover: #db2777;
+      --accent-soft: rgba(236, 72, 153, 0.16);
+      --accent-border: rgba(236, 72, 153, 0.38);
+      --text-primary: #fdf4ff;
+      --text-secondary: #d8b4fe;
+      --text-muted: #866ea8;
+      --title-grad-start: #ffffff;
+      --title-grad-end: #f9a8d4;
     }
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
+
+    /* Theme 4: Clean Slate */
+    [data-theme="clean-slate"] {
+      --bg-main: #0f1115;
+      --bg-card: #171a21;
+      --bg-card-hover: #1f242d;
+      --bg-elevated: #282e3a;
+      --border-color: #353c4a;
+      --accent: #f4f4f5;
+      --accent-hover: #d4d4d8;
+      --accent-soft: rgba(244, 244, 245, 0.14);
+      --accent-border: rgba(244, 244, 245, 0.35);
+      --text-primary: #ffffff;
+      --text-secondary: #d1d5db;
+      --text-muted: #9ca3af;
+      --title-grad-start: #ffffff;
+      --title-grad-end: #d4d4d8;
     }
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
-    .chrome-text {
-      background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
+
+    .font-display {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .theme-bg { background-color: var(--bg-main); }
+    .theme-card { background-color: var(--bg-card); border-color: var(--border-color); }
+    .theme-card-hover:hover { background-color: var(--bg-card-hover); }
+    .theme-elevated { background-color: var(--bg-elevated); border-color: var(--border-color); }
+    .theme-border { border-color: var(--border-color); }
+    .theme-text { color: var(--text-primary); }
+    .theme-text-sec { color: var(--text-secondary); }
+    .theme-text-muted { color: var(--text-muted); }
+
+    .btn-accent {
+      background-color: var(--accent);
+      color: #09090b;
+      font-weight: 700;
+    }
+    [data-theme="crimson-dark"] .btn-accent,
+    [data-theme="midnight-pink"] .btn-accent {
+      color: #ffffff;
+    }
+    .btn-accent:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .pill-accent-active {
+      background-color: var(--accent);
+      border-color: var(--accent);
+      color: #09090b;
+      font-weight: 700;
+    }
+    [data-theme="crimson-dark"] .pill-accent-active,
+    [data-theme="midnight-pink"] .pill-accent-active {
+      color: #ffffff;
+    }
+
+    .badge-accent {
+      background-color: var(--accent-soft);
+      border-color: var(--accent-border);
+      color: var(--text-primary);
+    }
+
+    .brand-title {
+      background: linear-gradient(180deg, var(--title-grad-start) 0%, var(--title-grad-end) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-main); }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-obsidian text-zinc-100 min-h-screen antialiased selection:bg-crimson selection:text-white">
+<body data-theme="crimson-dark" class="min-h-screen antialiased">
 
-  <!-- Toast Notification Banner (Replaces alert/confirm) -->
+  <!-- Toast Notification Stack -->
   <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-  <!-- Top Sticky Navigation Header -->
-  <header class="sticky top-0 z-30 bg-obsidian/90 backdrop-blur-md border-b border-borderDark">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <!-- Brand Title & Subtitle -->
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="hidden fixed inset-0 z-30 bg-black/70 backdrop-blur-xs lg:hidden"></div>
+
+  <div class="min-h-screen flex flex-col lg:flex-row">
+    <!-- ========================================================= -->
+    <!-- LEFT SIDEBAR: CREW VAULTS & PROFILE SHARING               -->
+    <!-- ========================================================= -->
+    <aside
+      id="crew-sidebar"
+      class="fixed lg:sticky top-0 left-0 z-40 h-screen w-72 shrink-0 theme-card border-r flex flex-col justify-between transition-transform duration-200 -translate-x-full lg:translate-x-0"
+    >
+      <div class="p-4 space-y-5 overflow-y-auto flex-1">
+        <!-- Sidebar Brand Header -->
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-crimson to-rose-900 flex items-center justify-center shadow-lg shadow-crimson/20 border border-rose-500/30">
-              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center border shadow-lg" style="background-color: var(--accent-soft); border-color: var(--accent-border);">
+              <svg class="w-4 h-4" style="color: var(--accent);" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 2L15 8L21 9L17 14L18 20L12 17L6 20L7 14L3 9L9 8L12 2Z" />
               </svg>
             </div>
             <div>
-              <h1 class="font-display font-bold text-lg sm:text-xl tracking-wider chrome-text leading-none">
+              <h1 class="font-display font-bold text-base tracking-wider brand-title leading-none">
                 VAULT // ARCHIVE
               </h1>
-              <p class="text-[11px] text-zinc-500 tracking-wide mt-0.5">PERSONAL HAUL & ROTATION INDEX</p>
+              <p class="text-[10px] theme-text-muted tracking-wide mt-0.5">CREW ROTATION & HAULS</p>
             </div>
           </div>
 
-          <!-- Mobile Add Button -->
-          <button onclick="openModal()" class="md:hidden inline-flex items-center gap-1.5 bg-crimson hover:bg-crimsonDark text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition shadow-lg shadow-crimson/20">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          <button onclick="toggleSidebar(false)" class="lg:hidden theme-text-muted hover:text-white p-1.5 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
-            Add Piece
           </button>
         </div>
 
-        <!-- Search + Currency + Actions -->
-        <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
-          <!-- Search Bar -->
-          <div class="relative flex-1 min-w-[200px] sm:w-64">
-            <svg class="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.15 6.15z" />
-            </svg>
-            <input
-              id="search-input"
-              type="text"
-              placeholder="Search brand, batch, notes..."
-              class="w-full bg-card border border-borderDark focus:border-crimson rounded-xl pl-9 pr-3 py-2 text-xs sm:text-sm text-zinc-100 placeholder-zinc-500 outline-none transition"
-            />
+        <!-- Crew Vaults List -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between px-1">
+            <span class="text-[11px] font-bold uppercase tracking-wider theme-text-muted">Crew Vaults</span>
+            <span id="crew-total-count" class="text-[10px] theme-text-muted">1 member</span>
           </div>
 
-          <!-- Currency Toggle -->
+          <div id="crew-sidebar-list" class="space-y-1.5"></div>
+
+          <!-- Join / Add Your Vault Button -->
           <button
-            id="currency-btn"
-            onclick="cycleCurrency()"
-            title="Switch Currency Display"
-            class="bg-card hover:bg-cardHover border border-borderDark text-zinc-300 text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5"
+            onclick="openJoinVaultModal()"
+            class="w-full mt-2 py-2.5 px-3 rounded-xl border border-dashed theme-border hover:border-solid theme-elevated text-xs font-semibold theme-text flex items-center justify-center gap-1.5 transition"
           >
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-            <span id="currency-label">USD + DKK</span>
+            <svg class="w-4 h-4" style="color: var(--accent);" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+            </svg>
+            <span>+ Join / Add Your Vault</span>
+          </button>
+        </div>
+
+        <!-- Friend Sharing & Merge Tools -->
+        <div class="pt-4 border-t theme-border space-y-2">
+          <span class="block px-1 text-[11px] font-bold uppercase tracking-wider theme-text-muted">Share & Sync Tools</span>
+
+          <button
+            onclick="copyCurrentProfileCode()"
+            class="w-full theme-elevated border px-3 py-2 rounded-xl text-xs font-semibold theme-text-sec hover:theme-text flex items-center gap-2 transition text-left"
+          >
+            <svg class="w-4 h-4 shrink-0" style="color: var(--accent);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            <span>Copy Profile Code</span>
           </button>
 
-          <!-- Sync / Backup Dropdown Trigger -->
-          <div class="relative">
+          <button
+            onclick="openImportVaultModal()"
+            class="w-full theme-elevated border px-3 py-2 rounded-xl text-xs font-semibold theme-text-sec hover:theme-text flex items-center gap-2 transition text-left"
+          >
+            <svg class="w-4 h-4 shrink-0" style="color: var(--accent);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            <span>Import Friend's Vault</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sidebar Footer: GitHub Sync Status -->
+      <div class="p-4 border-t theme-border">
+        <button
+          onclick="openSyncModal()"
+          class="w-full theme-elevated border px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition hover:opacity-90"
+        >
+          <span class="flex items-center gap-2">
+            <span id="sync-dot" class="w-2 h-2 rounded-full bg-amber-400"></span>
+            <span id="sync-status-text" class="theme-text">Local Mode</span>
+          </span>
+          <span class="text-[10px] theme-text-muted underline">Setup</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ========================================================= -->
+    <!-- MAIN CONTENT AREA                                         -->
+    <!-- ========================================================= -->
+    <div class="flex-1 min-w-0 flex flex-col">
+      <!-- Top Bar -->
+      <header class="sticky top-0 z-20 backdrop-blur-md border-b theme-border" style="background-color: color-mix(in srgb, var(--bg-main) 88%, transparent);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+          <!-- Left: Mobile Sidebar Toggle + Active Profile Header -->
+          <div class="flex items-center gap-2.5">
             <button
-              id="sync-menu-btn"
-              onclick="toggleSyncMenu()"
-              class="bg-card hover:bg-cardHover border border-borderDark text-zinc-300 text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5"
+              onclick="toggleSidebar(true)"
+              class="lg:hidden theme-card border p-2 rounded-xl theme-text"
+              aria-label="Open Crew Sidebar"
             >
-              <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
-              <span>Sync</span>
             </button>
 
-            <!-- Dropdown Menu -->
-            <div id="sync-dropdown" class="hidden absolute right-0 mt-2 w-52 bg-card border border-borderDark rounded-xl shadow-2xl p-1.5 z-40">
-              <button onclick="exportJSON()" class="w-full text-left px-3 py-2 text-xs text-zinc-200 hover:bg-cardHover rounded-lg flex items-center gap-2 transition">
-                <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Export Backup (.json)
+            <div class="flex items-center gap-2.5">
+              <span id="active-profile-dot" class="w-3 h-3 rounded-full shrink-0" style="background-color: #e11d48;"></span>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h2 id="active-profile-title" class="font-display font-bold text-base sm:text-lg theme-text leading-none">
+                    Mikkel's Vault
+                  </h2>
+                  <button
+                    id="delete-profile-btn"
+                    onclick="promptDeleteProfile()"
+                    class="hidden text-[11px] theme-text-muted hover:text-rose-400 underline"
+                    title="Remove this vault"
+                  >
+                    Remove
+                  </button>
+                </div>
+                <p id="active-profile-sub" class="text-[11px] theme-text-muted mt-0.5">0 pieces • 0 saved fits</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: View Switcher + Theme Selector + Add Piece -->
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- View Tabs -->
+            <div class="inline-flex rounded-xl p-1 theme-card border">
+              <button
+                id="view-tab-catalog"
+                onclick="switchMainView('catalog')"
+                class="px-3 py-1.5 rounded-lg text-xs font-semibold transition pill-accent-active"
+              >
+                Catalog
               </button>
-              <label class="w-full text-left px-3 py-2 text-xs text-zinc-200 hover:bg-cardHover rounded-lg flex items-center gap-2 cursor-pointer transition">
-                <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              <button
+                id="view-tab-fitcheck"
+                onclick="switchMainView('fitcheck')"
+                class="px-3 py-1.5 rounded-lg text-xs font-semibold transition theme-text-sec hover:theme-text"
+              >
+                Fit Check
+              </button>
+            </div>
+
+            <!-- Theme Selector -->
+            <div class="relative flex items-center theme-card border rounded-xl px-2.5 py-2">
+              <select
+                id="theme-select"
+                onchange="setTheme(this.value)"
+                aria-label="Select Theme"
+                class="bg-transparent text-xs font-semibold theme-text outline-none cursor-pointer"
+              >
+                <option value="crimson-dark" class="bg-zinc-900 text-white">Crimson Dark</option>
+                <option value="silver-frost" class="bg-zinc-900 text-white">Silver Frost</option>
+                <option value="midnight-pink" class="bg-zinc-900 text-white">Midnight Pink</option>
+                <option value="clean-slate" class="bg-zinc-900 text-white">Clean Slate</option>
+              </select>
+            </div>
+
+            <!-- Add Piece CTA -->
+            <button
+              onclick="openItemModal()"
+              class="btn-accent px-3.5 sm:px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 transition shadow-lg"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              <span>Add Piece</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- ========================================================= -->
+      <!-- VIEW 1: CATALOG & HAUL TRACKER                            -->
+      <!-- ========================================================= -->
+      <main id="catalog-view" class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+        <!-- Smart DHL Tax-Free Shipping & Weight Estimator Bar -->
+        <section class="theme-card border rounded-2xl p-4 sm:p-5 shadow-xl">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div class="space-y-2.5">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="badge-accent border text-[10px] uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-lg">
+                  DHL Tax-Free DK Estimator
+                </span>
+                <span id="dhl-profile-label" class="text-xs font-semibold theme-text-sec">Mikkel's Parcel</span>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2.5">
+                <div class="inline-flex rounded-xl p-1 theme-elevated border">
+                  <button onclick="setDhlScope('Next Haul')" id="scope-next" class="px-2.5 py-1 rounded-lg text-xs font-semibold transition pill-accent-active">
+                    Next Haul
+                  </button>
+                  <button onclick="setDhlScope('In Warehouse')" id="scope-warehouse" class="px-2.5 py-1 rounded-lg text-xs font-semibold transition theme-text-sec">
+                    In Warehouse
+                  </button>
+                  <button onclick="setDhlScope('Both')" id="scope-both" class="px-2.5 py-1 rounded-lg text-xs font-semibold transition theme-text-sec">
+                    Combined
+                  </button>
+                </div>
+
+                <label class="inline-flex items-center gap-2 cursor-pointer theme-elevated border px-3 py-1.5 rounded-xl text-xs font-medium select-none">
+                  <input
+                    type="checkbox"
+                    id="drop-boxes-toggle"
+                    checked
+                    onchange="updateDhlBar()"
+                    class="w-3.5 h-3.5 rounded accent-rose-600 cursor-pointer"
+                  />
+                  <span class="theme-text">Drop Shoeboxes</span>
+                  <span class="theme-text-muted text-[11px]">(-350g / pair)</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 lg:min-w-[520px]">
+              <div class="theme-elevated border rounded-xl p-3">
+                <p class="text-[10px] uppercase tracking-wider theme-text-muted font-semibold">Items Subtotal</p>
+                <p id="dhl-items-usd" class="font-display text-lg font-bold theme-text mt-0.5">$0.00</p>
+                <p id="dhl-items-dkk" class="text-[11px] theme-text-sec">0 DKK • 0 pcs</p>
+              </div>
+
+              <div class="theme-elevated border rounded-xl p-3">
+                <p class="text-[10px] uppercase tracking-wider theme-text-muted font-semibold">Est. Weight</p>
+                <p id="dhl-weight" class="font-display text-lg font-bold theme-text mt-0.5">0.00 kg</p>
+                <p id="dhl-weight-sub" class="text-[11px] theme-text-sec">0 g net</p>
+              </div>
+
+              <div class="theme-elevated border rounded-xl p-3">
+                <p class="text-[10px] uppercase tracking-wider theme-text-muted font-semibold">Est. DHL Line</p>
+                <p id="dhl-ship-usd" class="font-display text-lg font-bold" style="color: var(--accent);">~$0</p>
+                <p id="dhl-ship-dkk" class="text-[11px] theme-text-sec">~0 DKK to DK</p>
+              </div>
+
+              <div class="theme-elevated border rounded-xl p-3">
+                <p class="text-[10px] uppercase tracking-wider theme-text-muted font-semibold">All-In Landed</p>
+                <p id="dhl-total-usd" class="font-display text-lg font-bold text-emerald-400">$0.00</p>
+                <p id="dhl-total-dkk" class="text-[11px] theme-text-sec">~0 DKK total</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Search, Status Tabs & Category Filters -->
+        <section class="space-y-3">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div id="status-tabs" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1"></div>
+
+            <div class="flex items-center gap-2">
+              <div class="relative flex-1 md:w-60">
+                <svg class="w-4 h-4 theme-text-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.15 6.15z" />
                 </svg>
-                Import Backup (.json)
-                <input type="file" id="import-json-input" accept=".json" class="hidden" onchange="importJSON(event)" />
-              </label>
-              <div class="my-1 border-t border-borderDark"></div>
-              <button onclick="openResetConfirm()" class="w-full text-left px-3 py-2 text-xs text-rose-400 hover:bg-rose-950/40 rounded-lg flex items-center gap-2 transition">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Reset to Starter Catalog
+                <input
+                  id="search-input"
+                  type="text"
+                  placeholder="Search name, size, notes..."
+                  oninput="renderCatalog()"
+                  class="w-full theme-card border rounded-xl pl-9 pr-3 py-2 text-xs theme-text placeholder-zinc-500 outline-none"
+                />
+              </div>
+
+              <select
+                id="sort-select"
+                onchange="renderCatalog()"
+                class="theme-card border rounded-xl px-3 py-2 text-xs theme-text outline-none cursor-pointer"
+              >
+                <option value="default" class="bg-zinc-900">Default Order</option>
+                <option value="price-desc" class="bg-zinc-900">Price: High → Low</option>
+                <option value="price-asc" class="bg-zinc-900">Price: Low → High</option>
+                <option value="weight-desc" class="bg-zinc-900">Heaviest First</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="category-pills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1"></div>
+        </section>
+
+        <!-- Cards Grid -->
+        <section id="items-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5"></section>
+
+        <!-- Clean Empty State -->
+        <div id="empty-state" class="hidden theme-card border rounded-2xl p-12 text-center space-y-3">
+          <div class="w-12 h-12 rounded-2xl theme-elevated border mx-auto flex items-center justify-center">
+            <svg class="w-6 h-6 theme-text-muted" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+          </div>
+          <p id="empty-state-title" class="font-display text-lg font-bold theme-text">Your vault is empty</p>
+          <p id="empty-state-sub" class="text-xs theme-text-sec max-w-md mx-auto">
+            Click <span class="font-semibold theme-text">+ Add Piece</span> to add your first jacket, jeans, boots, or accessory.
+          </p>
+          <div class="flex items-center justify-center gap-2 pt-2">
+            <button id="empty-clear-btn" onclick="resetFilters()" class="hidden theme-elevated border px-4 py-2 rounded-xl text-xs font-semibold theme-text">
+              Clear Filters
+            </button>
+            <button onclick="openItemModal()" class="btn-accent px-5 py-2.5 rounded-xl text-xs shadow-lg">
+              + Add Piece
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <!-- ========================================================= -->
+      <!-- VIEW 2: FIT CHECK STUDIO (INTERACTIVE OUTFIT BUILDER)     -->
+      <!-- ========================================================= -->
+      <main id="fitcheck-view" class="hidden max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+        <section class="theme-card border rounded-2xl p-5 space-y-5 shadow-xl">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b theme-border pb-4">
+            <div>
+              <h2 class="font-display text-lg sm:text-xl font-bold theme-text">Fit Check Studio</h2>
+              <p class="text-xs theme-text-sec mt-0.5">
+                Pick 1 Outerwear/Top + 1 Denim + 1 Accessory + 1 Footwear from <span id="fit-owner-name" class="font-semibold theme-text">Mikkel</span>'s vault.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2.5">
+              <div class="theme-elevated border rounded-xl px-3.5 py-2 text-right">
+                <span class="text-[10px] uppercase tracking-wider theme-text-muted block font-semibold">Full Fit Value</span>
+                <span id="fit-total-cost" class="font-display font-bold text-sm sm:text-base theme-text">$0.00 (0 DKK)</span>
+              </div>
+              <button onclick="randomizeFit()" class="theme-elevated border px-3.5 py-2.5 rounded-xl text-xs font-semibold theme-text hover:opacity-85 transition">
+                Shuffle Fit
               </button>
             </div>
           </div>
 
-          <!-- Desktop Add Button -->
-          <button onclick="openModal()" class="hidden md:inline-flex items-center gap-1.5 bg-crimson hover:bg-crimsonDark text-white text-xs font-semibold px-4 py-2 rounded-xl transition shadow-lg shadow-crimson/20">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            Add Piece
-          </button>
-        </div>
-      </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div>
+              <label class="block text-[11px] font-semibold uppercase tracking-wider theme-text-muted mb-1.5">1. Outerwear / Top</label>
+              <select id="fit-slot-top" onchange="renderFitPreview()" class="w-full theme-elevated border rounded-xl px-3 py-2 text-xs theme-text outline-none"></select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold uppercase tracking-wider theme-text-muted mb-1.5">2. Denim / Bottoms</label>
+              <select id="fit-slot-denim" onchange="renderFitPreview()" class="w-full theme-elevated border rounded-xl px-3 py-2 text-xs theme-text outline-none"></select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold uppercase tracking-wider theme-text-muted mb-1.5">3. Belt / Accessory</label>
+              <select id="fit-slot-acc" onchange="renderFitPreview()" class="w-full theme-elevated border rounded-xl px-3 py-2 text-xs theme-text outline-none"></select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold uppercase tracking-wider theme-text-muted mb-1.5">4. Footwear</label>
+              <select id="fit-slot-shoes" onchange="renderFitPreview()" class="w-full theme-elevated border rounded-xl px-3 py-2 text-xs theme-text outline-none"></select>
+            </div>
+          </div>
+
+          <div id="fit-preview-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-1"></div>
+
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-3 border-t theme-border">
+            <input
+              type="text"
+              id="fit-preset-name"
+              placeholder="Name this outfit (e.g., Winter Super T + Tank 106)..."
+              class="flex-1 theme-elevated border rounded-xl px-3.5 py-2.5 text-xs theme-text placeholder-zinc-500 outline-none"
+            />
+            <button onclick="saveOutfitPreset()" class="btn-accent px-5 py-2.5 rounded-xl text-xs shrink-0 transition">
+              Save Outfit Preset
+            </button>
+          </div>
+        </section>
+
+        <section class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="font-display font-bold text-base theme-text">Saved Fit Presets</h3>
+            <span id="saved-fits-count" class="text-xs theme-text-muted">0 saved</span>
+          </div>
+          <div id="saved-fits-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </section>
+      </main>
     </div>
-  </header>
+  </div>
 
-  <!-- Main Content Container -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-
-    <!-- Live Metrics Dashboard Bar -->
-    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-      <div class="bg-card border border-borderDark rounded-2xl p-4">
-        <p class="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold">Total Pieces</p>
-        <div class="mt-1.5 flex items-baseline justify-between">
-          <span id="stat-count" class="font-display text-2xl sm:text-3xl font-bold text-white">0</span>
-          <span id="stat-filtered-note" class="text-[11px] text-zinc-500">in vault</span>
-        </div>
-      </div>
-
-      <div class="bg-card border border-borderDark rounded-2xl p-4">
-        <p class="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold">Next Haul Cart</p>
-        <div class="mt-1.5">
-          <span id="stat-nexthaul-price" class="font-display text-xl sm:text-2xl font-bold text-crimson">$0.00</span>
-          <p id="stat-nexthaul-sub" class="text-[11px] text-zinc-400 mt-0.5">0 DKK • 4 items</p>
-        </div>
-      </div>
-
-      <div class="bg-card border border-borderDark rounded-2xl p-4">
-        <p class="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold">Next Haul Weight</p>
-        <div class="mt-1.5">
-          <span id="stat-nexthaul-weight" class="font-display text-xl sm:text-2xl font-bold text-zinc-100">0.00 kg</span>
-          <p class="text-[11px] text-zinc-400 mt-0.5">Est. no shoeboxes</p>
-        </div>
-      </div>
-
-      <div class="bg-card border border-borderDark rounded-2xl p-4">
-        <p class="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold">Retail Value Saved</p>
-        <div class="mt-1.5">
-          <span id="stat-saved" class="font-display text-xl sm:text-2xl font-bold text-emerald-400">$0</span>
-          <p id="stat-saved-sub" class="text-[11px] text-zinc-400 mt-0.5">vs. buying new retail</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Filter Controls (Status Tabs + Category Pills) -->
-    <section class="space-y-3">
-      <!-- Row 1: Status Tabs -->
-      <div id="status-tabs" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-        <!-- Populated by JS -->
-      </div>
-
-      <!-- Row 2: Category Pills + Sort -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
-        <div id="category-pills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
-          <!-- Populated by JS -->
-        </div>
-
-        <div class="flex items-center gap-2 self-end sm:self-auto">
-          <label for="sort-select" class="text-xs text-zinc-500">Sort:</label>
-          <select id="sort-select" onchange="renderGrid()" class="bg-card border border-borderDark text-xs text-zinc-200 rounded-xl px-3 py-1.5 outline-none focus:border-crimson">
-            <option value="default">Catalog Order</option>
-            <option value="price-desc">Price: High to Low</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="weight-desc">Weight: Heaviest First</option>
-            <option value="savings-desc">Biggest Retail Savings</option>
-          </select>
-        </div>
-      </div>
-    </section>
-
-    <!-- Product Cards Grid -->
-    <section id="items-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-      <!-- Cards rendered dynamically -->
-    </section>
-
-    <!-- Empty State -->
-    <div id="empty-state" class="hidden bg-card border border-borderDark rounded-2xl p-10 text-center">
-      <p class="font-display text-lg font-bold text-zinc-200">No pieces match your current filter</p>
-      <p class="text-xs text-zinc-500 mt-1">Try clearing your search query or switching status/category tabs.</p>
-      <button onclick="resetFilters()" class="mt-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold px-4 py-2 rounded-xl transition">
-        Reset Filters
-      </button>
-    </div>
-
-  </main>
-
-  <!-- Add / Edit Piece Modal -->
-  <div id="piece-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-card border border-borderDark rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-auto">
-      <div class="flex items-center justify-between px-5 py-4 border-b border-borderDark">
-        <h2 id="modal-title" class="font-display font-bold text-base sm:text-lg text-white">Add New Piece</h2>
-        <button onclick="closeModal()" class="text-zinc-400 hover:text-white p-1 rounded-lg transition">
+  <!-- ========================================================= -->
+  <!-- MODAL 1: ADD / EDIT PIECE                                 -->
+  <!-- ========================================================= -->
+  <div id="item-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="theme-card border rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-auto">
+      <div class="flex items-center justify-between px-5 py-4 border-b theme-border">
+        <h2 id="item-modal-title" class="font-display font-bold text-base sm:text-lg theme-text">Add New Piece</h2>
+        <button onclick="closeItemModal()" class="theme-text-muted hover:text-white p-1 rounded-lg">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
 
-      <form id="piece-form" onsubmit="savePiece(event)" class="p-5 space-y-4 max-h-[82vh] overflow-y-auto">
-        <input type="hidden" id="field-id" />
+      <form id="item-form" onsubmit="handleSaveItem(event)" class="p-5 space-y-4 max-h-[82vh] overflow-y-auto">
+        <input type="hidden" id="item-id" />
 
-        <!-- Image Upload / URL Preview Box -->
         <div class="space-y-2">
-          <label class="block text-xs font-semibold text-zinc-300">Product / QC Photo</label>
+          <label class="block text-xs font-semibold theme-text-sec">Product or QC Photo</label>
           <div class="flex items-center gap-3.5">
-            <div id="modal-img-preview" class="w-20 h-20 rounded-xl bg-obsidian border border-borderDark flex items-center justify-center overflow-hidden shrink-0 text-zinc-600 text-[10px] text-center p-1">
+            <div id="item-img-preview" class="w-20 h-20 rounded-xl theme-elevated border flex items-center justify-center overflow-hidden shrink-0 text-[10px] theme-text-muted text-center p-1">
               No Photo
             </div>
             <div class="flex-1 space-y-2">
-              <label class="inline-flex items-center gap-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-medium px-3 py-1.5 rounded-lg cursor-pointer transition">
-                <svg class="w-3.5 h-3.5 text-crimson" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <label class="inline-flex items-center gap-1.5 theme-elevated border hover:opacity-90 theme-text text-xs font-semibold px-3 py-1.5 rounded-lg cursor-pointer transition">
+                <svg class="w-3.5 h-3.5" style="color: var(--accent);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                Upload Screenshot / Photo
-                <input type="file" id="field-image-file" accept="image/*" class="hidden" onchange="handleImageUpload(event)" />
+                <span>Upload Screenshot</span>
+                <input type="file" id="item-file-input" accept="image/*" class="hidden" onchange="handleScreenshotUpload(event)" />
               </label>
               <input
                 type="url"
-                id="field-image-url"
-                placeholder="Or paste direct image URL (https://...)"
-                oninput="updatePreviewFromUrl(this.value)"
-                class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-lg px-2.5 py-1.5 text-xs text-zinc-200 placeholder-zinc-600 outline-none"
+                id="item-image-url"
+                placeholder="Or paste image URL (https://...)"
+                oninput="previewImageUrl(this.value)"
+                class="w-full theme-elevated border rounded-lg px-2.5 py-1.5 text-xs theme-text placeholder-zinc-500 outline-none"
               />
             </div>
           </div>
         </div>
 
-        <!-- Item Name -->
         <div>
-          <label class="block text-xs font-semibold text-zinc-300 mb-1">Item Name *</label>
+          <label class="block text-xs font-semibold theme-text-sec mb-1">Item Name *</label>
           <input
             type="text"
-            id="field-name"
+            id="item-name"
             required
-            placeholder="e.g., White New Rock Tank 106 (M-TANK106-C1)"
-            class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none"
+            placeholder="e.g., Gray True Religion Super T Jacket"
+            class="w-full theme-elevated border rounded-xl px-3 py-2 text-xs sm:text-sm theme-text outline-none"
           />
         </div>
 
-        <!-- Category & Status -->
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-zinc-300 mb-1">Category *</label>
-            <select id="field-category" class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none">
-              <option value="Footwear">Footwear</option>
-              <option value="Jackets">Jackets</option>
-              <option value="Denim">Denim</option>
-              <option value="Tops">Tops</option>
-              <option value="Accessories">Accessories</option>
+            <label class="block text-xs font-semibold theme-text-sec mb-1">Category *</label>
+            <select id="item-category" class="w-full theme-elevated border rounded-xl px-3 py-2 text-xs sm:text-sm theme-text outline-none">
+              <option value="Outerwear" class="bg-zinc-900">Outerwear</option>
+              <option value="Tops" class="bg-zinc-900">Tops</option>
+              <option value="Denim" class="bg-zinc-900">Denim</option>
+              <option value="Footwear" class="bg-zinc-900">Footwear</option>
+              <option value="Accessories" class="bg-zinc-900">Accessories</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-zinc-300 mb-1">Status *</label>
-            <select id="field-status" class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none">
-              <option value="Next Haul ($250)">Next Haul ($250)</option>
-              <option value="Warehouse / Transit">Warehouse / Transit</option>
-              <option value="Owned & Christmas">Owned & Christmas</option>
-              <option value="Wishlist">Wishlist</option>
+            <label class="block text-xs font-semibold theme-text-sec mb-1">Status *</label>
+            <select id="item-status" class="w-full theme-elevated border rounded-xl px-3 py-2 text-xs sm:text-sm theme-text outline-none">
+              <option value="Next Haul" class="bg-zinc-900">Next Haul</option>
+              <option value="In Warehouse" class="bg-zinc-900">In Warehouse</option>
+              <option value="Owned" class="bg-zinc-900">Owned</option>
+              <option value="Wishlist" class="bg-zinc-900">Wishlist</option>
             </select>
           </div>
         </div>
 
-        <!-- Price USD, Retail USD, Weight -->
         <div class="grid grid-cols-3 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-zinc-300 mb-1">Your Price ($)</label>
-            <input type="number" step="0.01" id="field-price" required placeholder="74.82" class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none" />
+            <label class="block text-xs font-semibold theme-text-sec mb-1">Price (USD)</label>
+            <input type="number" step="0.01" id="item-price" placeholder="51.63" class="w-full theme-elevated border rounded-xl px-3 py-2 text-xs sm:text-sm theme-text outline-none" />
           </div>
           <div>
-            <label class="block text-xs font-semibold text-zinc-300 mb-1">Retail Est. ($)</label>
-            <input type="number" step="0.01" id="field-retail" placeholder="365" class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none" />
+            <label class="block text-xs font-semibold theme-text-sec mb-1">Weight (g)</label>
+            <input type="number" id="item-weight" placeholder="1100" class="w-full theme-elevated border rounded-xl px-3 py-2 text-xs sm:text-sm theme-text outline-none" />
           </div>
           <div>
-            <label class="block text-xs font-semibold text-zinc-300 mb-1">Weight (g)</label>
-            <input type="number" id="field-weight" placeholder="1950" class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none" />
+            <label class="block text-xs font-semibold theme-text-sec mb-1">Size</label>
+            <input type="text" id="item-size" placeholder="M / 30 / 42" class="w-full theme-elevated border rounded-xl px-3 py-2 text-xs sm:text-sm theme-text outline-none" />
           </div>
         </div>
 
-        <!-- Size & Batch/Seller -->
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-zinc-300 mb-1">Size</label>
-            <input type="text" id="field-size" placeholder="e.g., EU 42 / M / 30x32" class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-zinc-300 mb-1">Batch / Source</label>
-            <input type="text" id="field-batch" placeholder="e.g., 1688 / Hipobuy / Vinted" class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none" />
-          </div>
-        </div>
-
-        <!-- Product Link -->
         <div>
-          <label class="block text-xs font-semibold text-zinc-300 mb-1">Hipobuy / Taobao / Vinted Link</label>
-          <input type="url" id="field-link" placeholder="https://hipobuy.com/..." class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none" />
+          <label class="block text-xs font-semibold theme-text-sec mb-1">Hipobuy / Vinted / Store Link</label>
+          <input type="url" id="item-link" placeholder="https://hipobuy.com/..." class="w-full theme-elevated border rounded-xl px-3 py-2 text-xs sm:text-sm theme-text outline-none" />
         </div>
 
-        <!-- Notes -->
         <div>
-          <label class="block text-xs font-semibold text-zinc-300 mb-1">Notes / Fit Details</label>
-          <textarea id="field-notes" rows="2" placeholder="Batch notes, styling combos, QC reminders..." class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none"></textarea>
+          <label class="block text-xs font-semibold theme-text-sec mb-1">Notes</label>
+          <textarea id="item-notes" rows="2" placeholder="Batch details, stitching color, fit notes..." class="w-full theme-elevated border rounded-xl px-3 py-2 text-xs sm:text-sm theme-text outline-none"></textarea>
         </div>
 
-        <!-- Modal Footer Actions -->
-        <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-borderDark">
-          <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-400 hover:text-white hover:bg-zinc-800 transition">
+        <div class="flex items-center justify-end gap-2 pt-2 border-t theme-border">
+          <button type="button" onclick="closeItemModal()" class="px-4 py-2 rounded-xl text-xs font-semibold theme-text-sec hover:opacity-80">
             Cancel
           </button>
-          <button type="submit" class="bg-crimson hover:bg-crimsonDark text-white text-xs font-semibold px-5 py-2 rounded-xl transition shadow-lg shadow-crimson/20">
-            Save Piece
+          <button type="submit" class="btn-accent px-5 py-2 rounded-xl text-xs shadow-lg">
+            Save & Sync
           </button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Custom Confirm Modal (Delete / Reset without browser alert/confirm) -->
+  <!-- ========================================================= -->
+  <!-- MODAL 2: JOIN / ADD YOUR VAULT (SIDEBAR PROFILE CREATOR)  -->
+  <!-- ========================================================= -->
+  <div id="join-vault-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="theme-card border rounded-2xl w-full max-w-sm p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b theme-border pb-3">
+        <div>
+          <h3 class="font-display font-bold text-base theme-text">Add Your Vault</h3>
+          <p class="text-[11px] theme-text-muted mt-0.5">Creates a new list on the sidebar for you or a friend</p>
+        </div>
+        <button onclick="closeJoinVaultModal()" class="theme-text-muted hover:text-white p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <form onsubmit="handleCreateProfile(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold theme-text-sec mb-1">Name / Handle *</label>
+          <input
+            type="text"
+            id="new-profile-name"
+            required
+            maxlength="20"
+            placeholder="e.g., Lucas"
+            class="w-full theme-elevated border rounded-xl px-3 py-2 text-sm theme-text outline-none"
+          />
+        </div>
+
+        <div>
+          <label class="block font-semibold theme-text-sec mb-1.5">Badge Color</label>
+          <div id="badge-color-picker" class="flex items-center gap-2.5"></div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t theme-border">
+          <button type="button" onclick="closeJoinVaultModal()" class="px-3.5 py-2 rounded-xl font-semibold theme-text-sec">
+            Cancel
+          </button>
+          <button type="submit" class="btn-accent px-4 py-2 rounded-xl">
+            Add to Sidebar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 3: IMPORT FRIEND'S VAULT CODE                       -->
+  <!-- ========================================================= -->
+  <div id="import-vault-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="theme-card border rounded-2xl w-full max-w-md p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b theme-border pb-3">
+        <div>
+          <h3 class="font-display font-bold text-base theme-text">Import Friend's Vault</h3>
+          <p class="text-[11px] theme-text-muted mt-0.5">Paste a Profile Code from Lucas or a friend to add/update their sidebar tab</p>
+        </div>
+        <button onclick="closeImportVaultModal()" class="theme-text-muted hover:text-white p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <textarea
+          id="import-code-input"
+          rows="4"
+          placeholder="Paste friend's Profile Code here..."
+          class="w-full theme-elevated border rounded-xl p-3 theme-text font-mono text-[11px] outline-none"
+        ></textarea>
+
+        <div class="flex items-center justify-end gap-2 pt-1">
+          <button type="button" onclick="closeImportVaultModal()" class="px-3.5 py-2 rounded-xl font-semibold theme-text-sec">
+            Cancel
+          </button>
+          <button type="button" onclick="handleImportProfileCode()" class="btn-accent px-4 py-2 rounded-xl">
+            Merge & Sync
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 4: GITHUB DIRECT AUTO-SYNC SETTINGS                 -->
+  <!-- ========================================================= -->
+  <div id="sync-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="theme-card border rounded-2xl w-full max-w-md p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b theme-border pb-3">
+        <div>
+          <h3 class="font-display font-bold text-base theme-text">GitHub Auto-Sync (data.json)</h3>
+          <p class="text-[11px] theme-text-muted mt-0.5">Syncs changes automatically between your PC & phone</p>
+        </div>
+        <button onclick="closeSyncModal()" class="theme-text-muted hover:text-white p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block font-semibold theme-text-sec mb-1">GitHub Owner</label>
+            <input type="text" id="gh-owner" value="krogh245-ux" class="w-full theme-elevated border rounded-xl px-3 py-2 theme-text outline-none" />
+          </div>
+          <div>
+            <label class="block font-semibold theme-text-sec mb-1">Repository</label>
+            <input type="text" id="gh-repo" value="vault-archive" class="w-full theme-elevated border rounded-xl px-3 py-2 theme-text outline-none" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold theme-text-sec mb-1">Fine-Grained Personal Access Token</label>
+          <input
+            type="password"
+            id="gh-token"
+            placeholder="github_pat_..."
+            class="w-full theme-elevated border rounded-xl px-3 py-2 theme-text outline-none"
+          />
+          <p class="text-[11px] theme-text-muted mt-1 leading-relaxed">
+            Stored strictly in this browser's localStorage. Requires <span class="theme-text font-medium">Contents: Read and write</span> permission on <span class="theme-text font-medium">vault-archive</span>.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t theme-border">
+          <button type="button" onclick="forcePushToGitHub()" class="theme-elevated border px-3 py-2 rounded-xl font-semibold theme-text hover:opacity-90 transition">
+            Force Sync Now
+          </button>
+
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="clearGitHubToken()" class="px-3 py-2 rounded-xl font-semibold text-rose-400 hover:bg-rose-950/40 transition">
+              Remove Token
+            </button>
+            <button type="button" onclick="saveGitHubConfig()" class="btn-accent px-4 py-2 rounded-xl transition">
+              Save Config
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 5: CUSTOM CONFIRMATION DIALOG                       -->
+  <!-- ========================================================= -->
   <div id="confirm-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-card border border-borderDark rounded-2xl w-full max-w-sm p-5 shadow-2xl space-y-4">
-      <h3 id="confirm-title" class="font-display font-bold text-base text-white">Confirm Action</h3>
-      <p id="confirm-message" class="text-xs text-zinc-400 leading-relaxed">Are you sure?</p>
-      <div class="flex items-center justify-end gap-2 pt-2">
-        <button onclick="closeConfirmModal()" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-zinc-400 hover:bg-zinc-800 transition">Cancel</button>
-        <button id="confirm-action-btn" class="bg-crimson hover:bg-crimsonDark text-white text-xs font-semibold px-4 py-2 rounded-xl transition">Confirm</button>
+    <div class="theme-card border rounded-2xl w-full max-w-sm p-5 shadow-2xl space-y-4">
+      <h3 id="confirm-title" class="font-display font-bold text-base theme-text">Confirm</h3>
+      <p id="confirm-msg" class="text-xs theme-text-sec leading-relaxed">Are you sure?</p>
+      <div class="flex items-center justify-end gap-2 pt-1">
+        <button onclick="closeConfirmModal()" class="theme-elevated border px-3.5 py-2 rounded-xl text-xs font-semibold theme-text">Cancel</button>
+        <button id="confirm-ok-btn" class="btn-accent px-4 py-2 rounded-xl text-xs">Confirm</button>
       </div>
     </div>
   </div>
 
   <script>
-    // Exchange rate USD -> DKK
+    // =========================================================================
+    // CONSTANTS & CLEAN-SLATE INITIAL DATA (ZERO PRE-LOADED ITEMS)
+    // =========================================================================
     const DKK_RATE = 7.00;
-    const STORAGE_KEY = 'vault_archive_catalog_v1';
+    const STATUS_OPTIONS = ['All', 'Next Haul', 'In Warehouse', 'Owned', 'Wishlist'];
+    const CATEGORY_OPTIONS = ['All', 'Outerwear', 'Tops', 'Denim', 'Footwear', 'Accessories'];
+    const BADGE_COLORS = ['#e11d48', '#38bdf8', '#ec4899', '#10b981', '#f59e0b', '#a855f7', '#f4f4f5'];
 
-    // Starter Pre-loaded Wardrobe & Haul Catalog
-    const defaultItems = [
-      {
-        id: 'item-1',
-        name: 'White New Rock Tank 106 (M-TANK106-C1)',
-        category: 'Footwear',
-        status: 'Next Haul ($250)',
-        priceUsd: 74.82,
-        retailUsd: 365,
-        weightG: 1950,
-        size: 'EU 42',
-        batch: '1688 (瑞贡盛鞋行)',
-        link: '',
-        image: '',
-        notes: 'Mid/high-tier leather batch on brown New Rock box; drop box for shipping.'
-      },
-      {
-        id: 'item-2',
-        name: 'Black New Rock Tank 106 (M-TANK106-C2)',
-        category: 'Footwear',
-        status: 'Next Haul ($250)',
-        priceUsd: 74.82,
-        retailUsd: 355,
-        weightG: 1950,
-        size: 'EU 42',
-        batch: '1688 (瑞贡盛鞋行)',
-        link: '',
-        image: '',
-        notes: 'All-black platform Tank 106 batch; drop shoebox before shipping.'
-      },
-      {
-        id: 'item-3',
-        name: 'Gray True Religion Super T Denim Jacket',
-        category: 'Jackets',
-        status: 'Next Haul ($250)',
-        priceUsd: 51.63,
-        retailUsd: 219,
-        weightG: 1050,
-        size: 'M',
-        batch: 'Taobao (TR牛仔裤)',
-        link: '',
-        image: '',
-        notes: 'Washed gray denim with black-filled horseshoes and white contrast rope stitching.'
-      },
-      {
-        id: 'item-4',
-        name: 'Black True Religion Super T Denim Jacket',
-        category: 'Jackets',
-        status: 'Next Haul ($250)',
-        priceUsd: 49.51,
-        retailUsd: 219,
-        weightG: 1050,
-        size: 'M',
-        batch: 'Taobao (TR牛仔裤)',
-        link: '',
-        image: '',
-        notes: 'Black washed denim Jimmy Super T trucker with white contrast stitching.'
-      },
-      {
-        id: 'item-5',
-        name: 'Black/Red True Religion Heavyweight Jeans',
-        category: 'Denim',
-        status: 'Warehouse / Transit',
-        priceUsd: 33.00,
-        retailUsd: 199,
-        weightG: 920,
-        size: '30/32',
-        batch: 'Hipobuy Warehouse',
-        link: '',
-        image: '',
-        notes: 'Heavyweight straight-leg denim with red contrast stitching.'
-      },
-      {
-        id: 'item-6',
-        name: 'Washed Gray True Religion Heavyweight Jeans',
-        category: 'Denim',
-        status: 'Warehouse / Transit',
-        priceUsd: 33.00,
-        retailUsd: 199,
-        weightG: 920,
-        size: '30/32',
-        batch: 'Hipobuy Warehouse',
-        link: '',
-        image: '',
-        notes: 'Pairs with Gray Super T Jacket or black outerwear.'
-      },
-      {
-        id: 'item-7',
-        name: 'Flared Black Balenciaga Denim',
-        category: 'Denim',
-        status: 'Warehouse / Transit',
-        priceUsd: 22.00,
-        retailUsd: 950,
-        weightG: 880,
-        size: 'M',
-        batch: 'Hipobuy Warehouse',
-        link: '',
-        image: '',
-        notes: 'Stacks over New Rock Tank 106s.'
-      },
-      {
-        id: 'item-8',
-        name: 'White/Red Flared True Religion Jeans',
-        category: 'Denim',
-        status: 'Warehouse / Transit',
-        priceUsd: 11.00,
-        retailUsd: 179,
-        weightG: 780,
-        size: '30',
-        batch: 'Hipobuy Warehouse',
-        link: '',
-        image: '',
-        notes: 'Budget flared pair for white New Rocks / DC Court Graffiks.'
-      },
-      {
-        id: 'item-9',
-        name: 'Blue True Religion Straight Jeans (Cn0520)',
-        category: 'Denim',
-        status: 'Warehouse / Transit',
-        priceUsd: 10.00,
-        retailUsd: 179,
-        weightG: 760,
-        size: '30',
-        batch: 'Hipobuy Warehouse',
-        link: '',
-        image: '',
-        notes: 'Awaiting warehouse QC photos.'
-      },
-      {
-        id: 'item-10',
-        name: 'Haunt-O-Holix Pumpkin Polo',
-        category: 'Tops',
-        status: 'Warehouse / Transit',
-        priceUsd: 18.00,
-        retailUsd: 95,
-        weightG: 320,
-        size: 'M',
-        batch: 'Hipobuy Warehouse',
-        link: '',
-        image: '',
-        notes: 'Orange/black Haunted Mound staple; awaiting QC.'
-      },
-      {
-        id: 'item-11',
-        name: 'Jack Skellington B.B. Simon Belt',
-        category: 'Accessories',
-        status: 'Warehouse / Transit',
-        priceUsd: 15.00,
-        retailUsd: 380,
-        weightG: 420,
-        size: '105cm',
-        batch: 'Hipobuy Warehouse',
-        link: '',
-        image: '',
-        notes: 'Statement rhinestone western belt.'
-      },
-      {
-        id: 'item-12',
-        name: 'Baroque & Iridescent Belts + Studded Cuffs',
-        category: 'Accessories',
-        status: 'Warehouse / Transit',
-        priceUsd: 16.00,
-        retailUsd: 140,
-        weightG: 550,
-        size: 'One Size',
-        batch: 'Hipobuy Warehouse',
-        link: '',
-        image: '',
-        notes: 'Croc-embossed studded cuffs and alternate western belts.'
-      },
-      {
-        id: 'item-13',
-        name: 'Armani Jeans Straight Denim',
-        category: 'Denim',
-        status: 'Owned & Christmas',
-        priceUsd: 35.00,
-        retailUsd: 180,
-        weightG: 750,
-        size: '30',
-        batch: 'Local Pickup',
-        link: '',
-        image: '',
-        notes: 'Picking up tomorrow; clean archive Y2K fit.'
-      },
-      {
-        id: 'item-14',
-        name: 'White/Black DC Court Graffik',
-        category: 'Footwear',
-        status: 'Owned & Christmas',
-        priceUsd: 85.00,
-        retailUsd: 85,
-        weightG: 1100,
-        size: 'EU 42',
-        batch: 'Reserved Christmas Gift',
-        link: '',
-        image: '',
-        notes: 'Classic chunky Y2K skate silhouette.'
-      },
-      {
-        id: 'item-15',
-        name: 'Faux-Leather Fur-Trimmed Bomber Jacket',
-        category: 'Jackets',
-        status: 'Owned & Christmas',
-        priceUsd: 75.00,
-        retailUsd: 120,
-        weightG: 1250,
-        size: 'M',
-        batch: 'Reserved Christmas Gift',
-        link: '',
-        image: '',
-        notes: 'Winter statement bomber.'
-      },
-      {
-        id: 'item-16',
-        name: 'Black Waffle-Knit Henley & Locs Shades',
-        category: 'Tops',
-        status: 'Owned & Christmas',
-        priceUsd: 40.00,
-        retailUsd: 65,
-        weightG: 450,
-        size: 'M',
-        batch: 'Reserved Christmas Gift',
-        link: '',
-        image: '',
-        notes: 'Base layering henley + dark Y2K wraparound shades.'
-      },
-      {
-        id: 'item-17',
-        name: 'Ed Hardy Embroidered Flame Work Boots',
-        category: 'Footwear',
-        status: 'Wishlist',
-        priceUsd: 95.00,
-        retailUsd: 150,
-        weightG: 1600,
-        size: 'EU 42',
-        batch: 'Wishlist Target',
-        link: '',
-        image: '',
-        notes: 'Black 6-inch work boot with white stitched flames.'
-      },
-      {
-        id: 'item-18',
-        name: "Robin's Jean / Rock Revival Contrast Stitch Denim",
-        category: 'Denim',
-        status: 'Wishlist',
-        priceUsd: 65.00,
-        retailUsd: 240,
-        weightG: 950,
-        size: '30',
-        batch: 'Vinted / Secondhand',
-        link: '',
-        image: '',
-        notes: 'Heavy crystal/flap pocket archive denim.'
+    const LOCAL_DB_KEY = 'vault_archive_clean_db_v3';
+    const GH_CONFIG_KEY = 'vault_archive_gh_config_v3';
+    const THEME_KEY = 'vault_archive_theme_v3';
+
+    // Completely empty clean-slate starter database
+    const cleanStarterDatabase = {
+      profiles: {
+        Mikkel: {
+          color: '#e11d48',
+          items: [],
+          outfits: []
+        }
       }
-    ];
+    };
 
-    // App State
-    let items = [];
-    let activeStatus = 'All Pieces';
-    let activeCategory = 'All';
-    let searchQuery = '';
-    let currencyMode = 'BOTH'; // 'BOTH', 'USD', 'DKK'
-    let currentModalImageBase64 = '';
+    // =========================================================================
+    // APPLICATION STATE
+    // =========================================================================
+    let appDb = JSON.parse(JSON.stringify(cleanStarterDatabase));
+    let activeProfile = 'Mikkel';
+    let activeMainView = 'catalog';
+    let activeStatusFilter = 'All';
+    let activeCategoryFilter = 'All';
+    let dhlScope = 'Next Haul';
+    let uploadedImageBase64 = '';
+    let githubFileSha = null;
+    let selectedNewBadgeColor = BADGE_COLORS[1];
 
-    const STATUS_LIST = [
-      'All Pieces',
-      'Next Haul ($250)',
-      'Warehouse / Transit',
-      'Owned & Christmas',
-      'Wishlist'
-    ];
+    // =========================================================================
+    // INITIALIZATION & DATA LOADING
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', async () => {
+      initTheme();
+      loadLocalFallback();
+      loadGitHubConfigUI();
+      renderAll();
 
-    const CATEGORY_LIST = [
-      'All',
-      'Footwear',
-      'Jackets',
-      'Denim',
-      'Tops',
-      'Accessories'
-    ];
+      // Pull shared data.json from GitHub if available
+      await fetchFromGitHubRepo();
+    });
 
-    // Load items from localStorage or fall back to defaultItems
-    function loadItems() {
+    function initTheme() {
+      const savedTheme = localStorage.getItem(THEME_KEY) || 'crimson-dark';
+      setTheme(savedTheme, false);
+    }
+
+    function setTheme(themeName, persist = true) {
+      document.body.setAttribute('data-theme', themeName);
+      const sel = document.getElementById('theme-select');
+      if (sel) sel.value = themeName;
+      if (persist) localStorage.setItem(THEME_KEY, themeName);
+    }
+
+    function loadLocalFallback() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            items = parsed;
-            return;
+        const cached = localStorage.getItem(LOCAL_DB_KEY);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && parsed.profiles && Object.keys(parsed.profiles).length > 0) {
+            appDb = normalizeDatabase(parsed);
+            if (!appDb.profiles[activeProfile]) {
+              activeProfile = Object.keys(appDb.profiles)[0];
+            }
           }
         }
-      } catch (e) {
-        console.error('Failed to read localStorage:', e);
+      } catch (err) {
+        console.warn('Local cache read error:', err);
       }
-      items = JSON.parse(JSON.stringify(defaultItems));
-      saveItemsToStorage();
     }
 
-    function saveItemsToStorage() {
+    function saveLocalCache() {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-      } catch (e) {
-        showToast('Storage almost full — try exporting a JSON backup.', 'error');
+        localStorage.setItem(LOCAL_DB_KEY, JSON.stringify(appDb));
+      } catch (err) {
+        showToast('Browser storage full — rely on GitHub Sync or smaller images.', 'error');
       }
     }
 
-    // Currency formatting helper
-    function formatPrice(usdVal) {
-      const usd = Number(usdVal) || 0;
-      const dkk = Math.round(usd * DKK_RATE);
-      if (currencyMode === 'USD') return `$${usd.toFixed(2)}`;
-      if (currencyMode === 'DKK') return `${dkk.toLocaleString('da-DK')} kr.`;
-      return `$${usd.toFixed(2)} <span class="text-zinc-500 font-normal text-xs">(${dkk} kr.)</span>`;
+    function normalizeDatabase(raw) {
+      const normalized = { profiles: {} };
+      const entries = Object.entries(raw.profiles || {});
+      if (entries.length === 0) {
+        return JSON.parse(JSON.stringify(cleanStarterDatabase));
+      }
+      entries.forEach(([name, prof], idx) => {
+        normalized.profiles[name] = {
+          color: prof && prof.color ? prof.color : BADGE_COLORS[idx % BADGE_COLORS.length],
+          items: Array.isArray(prof && prof.items) ? prof.items : [],
+          outfits: Array.isArray(prof && prof.outfits) ? prof.outfits : []
+        };
+      });
+      return normalized;
     }
 
-    function cycleCurrency() {
-      const order = ['BOTH', 'USD', 'DKK'];
-      const labels = {
-        BOTH: 'USD + DKK',
-        USD: 'USD ($)',
-        DKK: 'DKK (kr.)'
-      };
-      const next = order[(order.indexOf(currencyMode) + 1) % order.length];
-      currencyMode = next;
-      document.getElementById('currency-label').textContent = labels[currencyMode];
-      updateStats();
-      renderGrid();
-    }
-
-    // Status Badge Colors
-    function getStatusBadgeClass(status) {
-      switch (status) {
-        case 'Next Haul ($250)':
-          return 'bg-crimson/15 text-rose-400 border-crimson/30';
-        case 'Warehouse / Transit':
-          return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
-        case 'Owned & Christmas':
-          return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
-        case 'Wishlist':
-          return 'bg-sky-500/15 text-sky-300 border-sky-500/30';
-        default:
-          return 'bg-zinc-800 text-zinc-300 border-zinc-700';
+    // =========================================================================
+    // SIDEBAR & PROFILE MANAGEMENT (JOIN / ADD YOUR VAULT + SHARE/IMPORT)
+    // =========================================================================
+    function toggleSidebar(open) {
+      const sidebar = document.getElementById('crew-sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (open) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
       }
     }
 
-    // Stylized SVG placeholder by Category when no photo is uploaded yet
-    function getCategoryPlaceholderSVG(category) {
-      const icons = {
-        Footwear: `<svg class="w-12 h-12 text-zinc-600" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A1.25 1.25 0 004.25 20h15.5A1.25 1.25 0 0021 18.75v-1.5c0-1.1-.78-2.05-1.86-2.25l-4.64-.85-2.5-3.65H8.5L6.5 14H4.25A1.25 1.25 0 003 15.25v1.25z"/></svg>`,
-        Jackets: `<svg class="w-12 h-12 text-zinc-600" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3l3 2 3-2 5 3-2 5v9a1 1 0 01-1 1H7a1 1 0 01-1-1v-9L4 6l5-3z"/></svg>`,
-        Denim: `<svg class="w-12 h-12 text-zinc-600" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3h10l1.5 18h-4.5L12 10l-2 11H5.5L7 3z"/></svg>`,
-        Tops: `<svg class="w-12 h-12 text-zinc-600" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 4l4 2 4-2 4 3-2 4h-2v9H8v-9H6L4 7l4-3z"/></svg>`,
-        Accessories: `<svg class="w-12 h-12 text-zinc-600" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="2"/><rect x="9" y="7" width="6" height="10" rx="1"/></svg>`
-      };
-      return icons[category] || icons.Footwear;
+    function renderCrewSidebar() {
+      const listEl = document.getElementById('crew-sidebar-list');
+      const names = Object.keys(appDb.profiles);
+      document.getElementById('crew-total-count').textContent = `${names.length} ${names.length === 1 ? 'member' : 'members'}`;
+
+      listEl.innerHTML = names
+        .map(name => {
+          const prof = appDb.profiles[name];
+          const isActive = activeProfile === name;
+          return `
+            <button
+              onclick="switchProfile('${escapeAttr(name)}')"
+              class="w-full px-3 py-2.5 rounded-xl border text-left flex items-center justify-between transition ${
+                isActive ? 'pill-accent-active shadow-md' : 'theme-elevated border theme-text-sec hover:theme-text'
+              }"
+            >
+              <span class="flex items-center gap-2.5 min-w-0">
+                <span class="w-2.5 h-2.5 rounded-full shrink-0 border border-black/30" style="background-color: ${escapeAttr(prof.color)};"></span>
+                <span class="text-xs font-bold truncate">${escapeHtml(name)}</span>
+              </span>
+              <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold ${isActive ? 'bg-black/25' : 'theme-card'}">
+                ${prof.items.length}
+              </span>
+            </button>
+          `;
+        })
+        .join('');
+
+      // Update Top Header Active Profile Info
+      const currentProf = appDb.profiles[activeProfile];
+      document.getElementById('active-profile-dot').style.backgroundColor = currentProf.color;
+      document.getElementById('active-profile-title').textContent = `${activeProfile}'s Vault`;
+      document.getElementById('active-profile-sub').textContent = `${currentProf.items.length} pieces • ${currentProf.outfits.length} saved fits`;
+
+      const delBtn = document.getElementById('delete-profile-btn');
+      if (names.length > 1 && activeProfile !== 'Mikkel') {
+        delBtn.classList.remove('hidden');
+      } else {
+        delBtn.classList.add('hidden');
+      }
     }
 
-    // Render Filter Tabs & Pills
-    function renderFilters() {
-      const statusContainer = document.getElementById('status-tabs');
-      statusContainer.innerHTML = STATUS_LIST.map(st => {
-        const count = st === 'All Pieces'
-          ? items.length
-          : items.filter(i => i.status === st).length;
-        const isActive = activeStatus === st;
+    function switchProfile(name) {
+      if (!appDb.profiles[name]) return;
+      activeProfile = name;
+      toggleSidebar(false);
+      renderAll();
+    }
+
+    function openJoinVaultModal() {
+      document.getElementById('new-profile-name').value = '';
+      selectedNewBadgeColor = BADGE_COLORS[Object.keys(appDb.profiles).length % BADGE_COLORS.length];
+      renderBadgeColorPicker();
+      document.getElementById('join-vault-modal').classList.remove('hidden');
+    }
+
+    function closeJoinVaultModal() {
+      document.getElementById('join-vault-modal').classList.add('hidden');
+    }
+
+    function renderBadgeColorPicker() {
+      const container = document.getElementById('badge-color-picker');
+      container.innerHTML = BADGE_COLORS.map(hex => {
+        const selected = selectedNewBadgeColor === hex;
+        return `
+          <button
+            type="button"
+            onclick="selectBadgeColor('${hex}')"
+            class="w-7 h-7 rounded-full transition ${selected ? 'ring-2 ring-white scale-110' : 'opacity-75 hover:opacity-100'}"
+            style="background-color: ${hex};"
+            aria-label="Select badge color ${hex}"
+          ></button>
+        `;
+      }).join('');
+    }
+
+    function selectBadgeColor(hex) {
+      selectedNewBadgeColor = hex;
+      renderBadgeColorPicker();
+    }
+
+    async function handleCreateProfile(event) {
+      event.preventDefault();
+      const rawName = document.getElementById('new-profile-name').value.trim();
+      if (!rawName) return;
+
+      // Case-insensitive duplicate check
+      const existingKey = Object.keys(appDb.profiles).find(k => k.toLowerCase() === rawName.toLowerCase());
+      if (existingKey) {
+        activeProfile = existingKey;
+        closeJoinVaultModal();
+        toggleSidebar(false);
+        renderAll();
+        showToast(`Switched to existing vault: ${existingKey}`);
+        return;
+      }
+
+      appDb.profiles[rawName] = {
+        color: selectedNewBadgeColor,
+        items: [],
+        outfits: []
+      };
+      activeProfile = rawName;
+      closeJoinVaultModal();
+      toggleSidebar(false);
+      renderAll();
+      showToast(`Added ${rawName}'s Vault to sidebar!`);
+      await persistAndSync();
+    }
+
+    function promptDeleteProfile() {
+      if (activeProfile === 'Mikkel' || Object.keys(appDb.profiles).length <= 1) return;
+      const target = activeProfile;
+      document.getElementById('confirm-title').textContent = `Remove ${target}'s Vault?`;
+      document.getElementById('confirm-msg').textContent = `This will remove ${target}'s profile and all items inside it from the sidebar.`;
+      document.getElementById('confirm-ok-btn').onclick = async () => {
+        delete appDb.profiles[target];
+        activeProfile = Object.keys(appDb.profiles)[0];
+        closeConfirmModal();
+        renderAll();
+        await persistAndSync();
+      };
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+
+    function copyCurrentProfileCode() {
+      const prof = appDb.profiles[activeProfile];
+      const payload = {
+        v: 1,
+        name: activeProfile,
+        profile: prof
+      };
+      const encoded = encodeBase64Unicode(JSON.stringify(payload));
+      const tempArea = document.createElement('textarea');
+      tempArea.value = encoded;
+      document.body.appendChild(tempArea);
+      tempArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempArea);
+      showToast(`Copied ${activeProfile}'s Profile Code!`);
+    }
+
+    function openImportVaultModal() {
+      document.getElementById('import-code-input').value = '';
+      document.getElementById('import-vault-modal').classList.remove('hidden');
+    }
+
+    function closeImportVaultModal() {
+      document.getElementById('import-vault-modal').classList.add('hidden');
+    }
+
+    async function handleImportProfileCode() {
+      const raw = document.getElementById('import-code-input').value.trim();
+      if (!raw) return;
+      try {
+        const decoded = decodeBase64Unicode(raw);
+        const parsed = JSON.parse(decoded);
+        if (!parsed || !parsed.name || !parsed.profile) {
+          throw new Error('Invalid code format');
+        }
+        const friendName = String(parsed.name).trim().slice(0, 20);
+        appDb.profiles[friendName] = {
+          color: parsed.profile.color || BADGE_COLORS[Object.keys(appDb.profiles).length % BADGE_COLORS.length],
+          items: Array.isArray(parsed.profile.items) ? parsed.profile.items : [],
+          outfits: Array.isArray(parsed.profile.outfits) ? parsed.profile.outfits : []
+        };
+        activeProfile = friendName;
+        closeImportVaultModal();
+        toggleSidebar(false);
+        renderAll();
+        showToast(`Imported ${friendName}'s Vault!`);
+        await persistAndSync();
+      } catch (err) {
+        showToast('Invalid Profile Code — check that you copied the full text.', 'error');
+      }
+    }
+
+    // =========================================================================
+    // DIRECT GITHUB REST API AUTO-SYNC (data.json)
+    // =========================================================================
+    function getGitHubConfig() {
+      try {
+        const raw = localStorage.getItem(GH_CONFIG_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return { owner: 'krogh245-ux', repo: 'vault-archive', token: '' };
+    }
+
+    function loadGitHubConfigUI() {
+      const cfg = getGitHubConfig();
+      document.getElementById('gh-owner').value = cfg.owner || 'krogh245-ux';
+      document.getElementById('gh-repo').value = cfg.repo || 'vault-archive';
+      document.getElementById('gh-token').value = cfg.token || '';
+      updateSyncBadge(cfg.token ? 'ready' : 'local');
+    }
+
+    function updateSyncBadge(state) {
+      const dot = document.getElementById('sync-dot');
+      const txt = document.getElementById('sync-status-text');
+      if (!dot || !txt) return;
+
+      if (state === 'syncing') {
+        dot.className = 'w-2 h-2 rounded-full bg-sky-400 animate-ping';
+        txt.textContent = 'Syncing...';
+      } else if (state === 'synced') {
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+        txt.textContent = 'Synced to GitHub';
+      } else if (state === 'ready') {
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+        txt.textContent = 'GitHub Ready';
+      } else if (state === 'error') {
+        dot.className = 'w-2 h-2 rounded-full bg-rose-500';
+        txt.textContent = 'Sync Error';
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-amber-400';
+        txt.textContent = 'Local Mode';
+      }
+    }
+
+    async function fetchFromGitHubRepo() {
+      const cfg = getGitHubConfig();
+      try {
+        const relRes = await fetch(`./data.json?t=${Date.now()}`);
+        if (relRes.ok) {
+          const remoteJson = await relRes.json();
+          if (remoteJson && remoteJson.profiles && Object.keys(remoteJson.profiles).length > 0) {
+            appDb = normalizeDatabase(remoteJson);
+            if (!appDb.profiles[activeProfile]) activeProfile = Object.keys(appDb.profiles)[0];
+            saveLocalCache();
+            renderAll();
+          }
+        }
+
+        if (cfg.token) {
+          const apiRes = await fetch(
+            `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/data.json?t=${Date.now()}`,
+            {
+              headers: {
+                Authorization: `Bearer ${cfg.token}`,
+                Accept: 'application/vnd.github+json'
+              }
+            }
+          );
+          if (apiRes.ok) {
+            const fileMeta = await apiRes.json();
+            githubFileSha = fileMeta.sha;
+            if (fileMeta.content) {
+              const decoded = decodeBase64Unicode(fileMeta.content.replace(/\n/g, ''));
+              const parsed = JSON.parse(decoded);
+              if (parsed && parsed.profiles && Object.keys(parsed.profiles).length > 0) {
+                appDb = normalizeDatabase(parsed);
+                if (!appDb.profiles[activeProfile]) activeProfile = Object.keys(appDb.profiles)[0];
+                saveLocalCache();
+                renderAll();
+              }
+            }
+            updateSyncBadge('synced');
+          } else if (apiRes.status === 404) {
+            githubFileSha = null;
+            updateSyncBadge('ready');
+          }
+        }
+      } catch (err) {
+        console.warn('Remote fetch skipped:', err);
+      }
+    }
+
+    async function persistAndSync() {
+      saveLocalCache();
+      const cfg = getGitHubConfig();
+      if (!cfg.token) {
+        updateSyncBadge('local');
+        return;
+      }
+
+      updateSyncBadge('syncing');
+      const apiUrl = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/data.json`;
+
+      try {
+        const headRes = await fetch(`${apiUrl}?t=${Date.now()}`, {
+          headers: {
+            Authorization: `Bearer ${cfg.token}`,
+            Accept: 'application/vnd.github+json'
+          }
+        });
+        if (headRes.ok) {
+          const meta = await headRes.json();
+          githubFileSha = meta.sha;
+        } else if (headRes.status === 404) {
+          githubFileSha = null;
+        }
+
+        const payload = {
+          message: `Update vault data (${activeProfile})`,
+          content: encodeBase64Unicode(JSON.stringify(appDb, null, 2))
+        };
+        if (githubFileSha) {
+          payload.sha = githubFileSha;
+        }
+
+        const putRes = await fetch(apiUrl, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${cfg.token}`,
+            Accept: 'application/vnd.github+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!putRes.ok) {
+          const errData = await putRes.json().catch(() => ({}));
+          throw new Error(errData.message || `HTTP ${putRes.status}`);
+        }
+
+        const result = await putRes.json();
+        if (result.content && result.content.sha) {
+          githubFileSha = result.content.sha;
+        }
+        updateSyncBadge('synced');
+        showToast('Synced to GitHub (data.json)');
+      } catch (err) {
+        console.error('GitHub Sync Error:', err);
+        updateSyncBadge('error');
+        showToast(`GitHub sync failed: ${err.message}`, 'error');
+      }
+    }
+
+    function encodeBase64Unicode(str) {
+      const bytes = new TextEncoder().encode(str);
+      let bin = '';
+      for (let i = 0; i < bytes.length; i++) {
+        bin += String.fromCharCode(bytes[i]);
+      }
+      return btoa(bin);
+    }
+
+    function decodeBase64Unicode(base64) {
+      const bin = atob(base64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) {
+        bytes[i] = bin.charCodeAt(i);
+      }
+      return new TextDecoder().decode(bytes);
+    }
+
+    function openSyncModal() {
+      loadGitHubConfigUI();
+      document.getElementById('sync-modal').classList.remove('hidden');
+    }
+
+    function closeSyncModal() {
+      document.getElementById('sync-modal').classList.add('hidden');
+    }
+
+    async function saveGitHubConfig() {
+      const owner = document.getElementById('gh-owner').value.trim() || 'krogh245-ux';
+      const repo = document.getElementById('gh-repo').value.trim() || 'vault-archive';
+      const token = document.getElementById('gh-token').value.trim();
+
+      localStorage.setItem(GH_CONFIG_KEY, JSON.stringify({ owner, repo, token }));
+      closeSyncModal();
+      if (token) {
+        showToast('GitHub token saved — syncing...');
+        await persistAndSync();
+      } else {
+        updateSyncBadge('local');
+        showToast('Saved in Local Mode.');
+      }
+    }
+
+    async function forcePushToGitHub() {
+      const cfg = getGitHubConfig();
+      const tokenInput = document.getElementById('gh-token').value.trim();
+      if (tokenInput) {
+        localStorage.setItem(
+          GH_CONFIG_KEY,
+          JSON.stringify({
+            owner: document.getElementById('gh-owner').value.trim() || cfg.owner,
+            repo: document.getElementById('gh-repo').value.trim() || cfg.repo,
+            token: tokenInput
+          })
+        );
+      }
+      closeSyncModal();
+      await persistAndSync();
+    }
+
+    function clearGitHubToken() {
+      const cfg = getGitHubConfig();
+      localStorage.setItem(GH_CONFIG_KEY, JSON.stringify({ owner: cfg.owner, repo: cfg.repo, token: '' }));
+      document.getElementById('gh-token').value = '';
+      updateSyncBadge('local');
+      closeSyncModal();
+      showToast('Token removed — switched to Local Mode.');
+    }
+
+    // =========================================================================
+    // RENDERING & VIEW SWITCHING
+    // =========================================================================
+    function renderAll() {
+      renderCrewSidebar();
+      updateDhlBar();
+      renderFilterPills();
+      renderCatalog();
+      populateFitCheckDropdowns();
+      renderFitPreview();
+      renderSavedOutfits();
+    }
+
+    function switchMainView(view) {
+      activeMainView = view;
+      const catView = document.getElementById('catalog-view');
+      const fitView = document.getElementById('fitcheck-view');
+      const tabCat = document.getElementById('view-tab-catalog');
+      const tabFit = document.getElementById('view-tab-fitcheck');
+
+      if (view === 'catalog') {
+        catView.classList.remove('hidden');
+        fitView.classList.add('hidden');
+        tabCat.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition pill-accent-active';
+        tabFit.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition theme-text-sec hover:theme-text';
+      } else {
+        catView.classList.add('hidden');
+        fitView.classList.remove('hidden');
+        tabFit.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition pill-accent-active';
+        tabCat.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition theme-text-sec hover:theme-text';
+        populateFitCheckDropdowns();
+        renderFitPreview();
+        renderSavedOutfits();
+      }
+    }
+
+    // =========================================================================
+    // SMART DHL TAX-FREE SHIPPING & WEIGHT ESTIMATOR
+    // =========================================================================
+    function setDhlScope(scope) {
+      dhlScope = scope;
+      const map = {
+        'Next Haul': 'scope-next',
+        'In Warehouse': 'scope-warehouse',
+        'Both': 'scope-both'
+      };
+      Object.entries(map).forEach(([key, elId]) => {
+        const el = document.getElementById(elId);
+        if (!el) return;
+        el.className =
+          key === scope
+            ? 'px-2.5 py-1 rounded-lg text-xs font-semibold transition pill-accent-active'
+            : 'px-2.5 py-1 rounded-lg text-xs font-semibold transition theme-text-sec';
+      });
+      updateDhlBar();
+    }
+
+    function estimateDhlDenmarkUsd(grams) {
+      if (grams <= 0) return 0;
+      const kg = grams / 1000;
+      const raw = 22 + Math.max(0, kg - 0.5) * 11.2;
+      return Math.round(raw);
+    }
+
+    function updateDhlBar() {
+      const profileItems = appDb.profiles[activeProfile].items;
+      const dropBoxes = document.getElementById('drop-boxes-toggle').checked;
+
+      const scopedItems = profileItems.filter(item => {
+        if (dhlScope === 'Both') return item.status === 'Next Haul' || item.status === 'In Warehouse';
+        return item.status === dhlScope;
+      });
+
+      const itemsUsd = scopedItems.reduce((sum, i) => sum + (Number(i.priceUsd) || 0), 0);
+      const itemsDkk = Math.round(itemsUsd * DKK_RATE);
+
+      let totalGrams = scopedItems.reduce((sum, i) => sum + (Number(i.weightG) || 0), 0);
+      if (dropBoxes) {
+        const footwearCount = scopedItems.filter(i => i.category === 'Footwear' && (Number(i.weightG) || 0) > 0).length;
+        totalGrams = Math.max(0, totalGrams - footwearCount * 350);
+      }
+
+      const shipUsd = estimateDhlDenmarkUsd(totalGrams);
+      const shipDkk = Math.round(shipUsd * DKK_RATE);
+      const totalUsd = itemsUsd + shipUsd;
+      const totalDkk = Math.round(totalUsd * DKK_RATE);
+
+      document.getElementById('dhl-profile-label').textContent = `${activeProfile}'s Parcel (${dhlScope})`;
+      document.getElementById('dhl-items-usd').textContent = `$${itemsUsd.toFixed(2)}`;
+      document.getElementById('dhl-items-dkk').textContent = `${itemsDkk.toLocaleString('da-DK')} DKK • ${scopedItems.length} pcs`;
+      document.getElementById('dhl-weight').textContent = `${(totalGrams / 1000).toFixed(2)} kg`;
+      document.getElementById('dhl-weight-sub').textContent = `${totalGrams.toLocaleString()} g ${dropBoxes ? '(no boxes)' : '(boxed)'}`;
+      document.getElementById('dhl-ship-usd').textContent = `~$${shipUsd}`;
+      document.getElementById('dhl-ship-dkk').textContent = `~${shipDkk.toLocaleString('da-DK')} DKK to DK`;
+      document.getElementById('dhl-total-usd').textContent = `$${totalUsd.toFixed(2)}`;
+      document.getElementById('dhl-total-dkk').textContent = `~${totalDkk.toLocaleString('da-DK')} DKK total`;
+    }
+
+    // =========================================================================
+    // CATALOG GRID RENDERING
+    // =========================================================================
+    function renderFilterPills() {
+      const profileItems = appDb.profiles[activeProfile].items;
+
+      const statusEl = document.getElementById('status-tabs');
+      statusEl.innerHTML = STATUS_OPTIONS.map(st => {
+        const count = st === 'All' ? profileItems.length : profileItems.filter(i => i.status === st).length;
+        const active = activeStatusFilter === st;
         return `
           <button
             onclick="setStatusFilter('${st}')"
-            class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold border transition flex items-center gap-2 ${
-              isActive
-                ? 'bg-crimson text-white border-crimson shadow-md shadow-crimson/20'
-                : 'bg-card text-zinc-400 border-borderDark hover:text-zinc-200 hover:bg-cardHover'
+            class="px-3 py-1.5 rounded-xl text-xs font-semibold border transition flex items-center gap-1.5 shrink-0 ${
+              active ? 'pill-accent-active' : 'theme-card theme-card-hover theme-text-sec'
             }"
           >
             <span>${st}</span>
-            <span class="px-1.5 py-0.5 rounded-md text-[10px] ${isActive ? 'bg-black/25 text-white' : 'bg-obsidian text-zinc-400'}">${count}</span>
+            <span class="text-[10px] px-1.5 rounded-md ${active ? 'bg-black/25' : 'theme-elevated'}">${count}</span>
           </button>
         `;
       }).join('');
 
-      const catContainer = document.getElementById('category-pills');
-      catContainer.innerHTML = CATEGORY_LIST.map(cat => {
-        const isActive = activeCategory === cat;
+      const catEl = document.getElementById('category-pills');
+      catEl.innerHTML = CATEGORY_OPTIONS.map(cat => {
+        const active = activeCategoryFilter === cat;
         return `
           <button
             onclick="setCategoryFilter('${cat}')"
-            class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium border transition ${
-              isActive
-                ? 'bg-zinc-200 text-obsidian border-zinc-200 font-semibold'
-                : 'bg-obsidian text-zinc-400 border-borderDark hover:text-zinc-200'
+            class="px-3 py-1 rounded-lg text-xs font-medium border transition shrink-0 ${
+              active ? 'bg-white text-zinc-950 border-white font-semibold' : 'theme-card theme-text-sec hover:opacity-90'
             }"
           >
             ${cat}
@@ -797,185 +1478,520 @@
     }
 
     function setStatusFilter(st) {
-      activeStatus = st;
-      renderFilters();
-      renderGrid();
+      activeStatusFilter = st;
+      renderFilterPills();
+      renderCatalog();
     }
 
     function setCategoryFilter(cat) {
-      activeCategory = cat;
-      renderFilters();
-      renderGrid();
+      activeCategoryFilter = cat;
+      renderFilterPills();
+      renderCatalog();
     }
 
     function resetFilters() {
-      activeStatus = 'All Pieces';
-      activeCategory = 'All';
-      searchQuery = '';
+      activeStatusFilter = 'All';
+      activeCategoryFilter = 'All';
       document.getElementById('search-input').value = '';
-      renderFilters();
-      renderGrid();
+      renderFilterPills();
+      renderCatalog();
     }
 
-    // Update Top Summary Cards
-    function updateStats() {
-      const nextHaulItems = items.filter(i => i.status === 'Next Haul ($250)');
-      const nextHaulUsd = nextHaulItems.reduce((sum, i) => sum + (Number(i.priceUsd) || 0), 0);
-      const nextHaulDkk = Math.round(nextHaulUsd * DKK_RATE);
-      const nextHaulWeightKg = (nextHaulItems.reduce((sum, i) => sum + (Number(i.weightG) || 0), 0) / 1000).toFixed(2);
-
-      // Retail savings across Next Haul + Warehouse items
-      const haulAndWarehouse = items.filter(i => i.status === 'Next Haul ($250)' || i.status === 'Warehouse / Transit');
-      const totalSavedUsd = haulAndWarehouse.reduce((sum, i) => {
-        const retail = Number(i.retailUsd) || 0;
-        const paid = Number(i.priceUsd) || 0;
-        return sum + Math.max(0, retail - paid);
-      }, 0);
-      const totalSavedDkk = Math.round(totalSavedUsd * DKK_RATE);
-
-      document.getElementById('stat-count').textContent = items.length;
-      document.getElementById('stat-nexthaul-price').textContent =
-        currencyMode === 'DKK' ? `${nextHaulDkk.toLocaleString('da-DK')} kr.` : `$${nextHaulUsd.toFixed(2)}`;
-      document.getElementById('stat-nexthaul-sub').textContent =
-        `${nextHaulDkk.toLocaleString('da-DK')} DKK • ${nextHaulItems.length} pieces`;
-      document.getElementById('stat-nexthaul-weight').textContent = `${nextHaulWeightKg} kg`;
-      document.getElementById('stat-saved').textContent =
-        currencyMode === 'DKK' ? `${totalSavedDkk.toLocaleString('da-DK')} kr.` : `$${Math.round(totalSavedUsd).toLocaleString()}`;
-      document.getElementById('stat-saved-sub').textContent =
-        `~${totalSavedDkk.toLocaleString('da-DK')} DKK saved vs. retail`;
+    function getStatusBadgeStyle(status) {
+      switch (status) {
+        case 'Next Haul':
+          return 'badge-accent border';
+        case 'In Warehouse':
+          return 'bg-amber-500/15 text-amber-300 border border-amber-500/35';
+        case 'Owned':
+          return 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/35';
+        case 'Wishlist':
+          return 'bg-sky-500/15 text-sky-300 border border-sky-500/35';
+        default:
+          return 'theme-elevated border theme-text-sec';
+      }
     }
 
-    // Render Product Cards
-    function renderGrid() {
+    function getCategorySVG(cat) {
+      const svgs = {
+        Outerwear: `<svg class="w-11 h-11 theme-text-muted" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3l3 2 3-2 5 3-2 5v9a1 1 0 01-1 1H7a1 1 0 01-1-1v-9L4 6l5-3z"/></svg>`,
+        Tops: `<svg class="w-11 h-11 theme-text-muted" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 4l4 2 4-2 4 3-2 4h-2v9H8v-9H6L4 7l4-3z"/></svg>`,
+        Denim: `<svg class="w-11 h-11 theme-text-muted" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3h10l1.5 18h-4.5L12 10l-2 11H5.5L7 3z"/></svg>`,
+        Footwear: `<svg class="w-11 h-11 theme-text-muted" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A1.25 1.25 0 004.25 20h15.5A1.25 1.25 0 0021 18.75v-1.5c0-1.1-.78-2.05-1.86-2.25l-4.64-.85-2.5-3.65H8.5L6.5 14H4.25A1.25 1.25 0 003 15.25v1.25z"/></svg>`,
+        Accessories: `<svg class="w-11 h-11 theme-text-muted" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="2"/><rect x="9" y="7" width="6" height="10" rx="1"/></svg>`
+      };
+      return svgs[cat] || svgs.Outerwear;
+    }
+
+    function renderCatalog() {
       const grid = document.getElementById('items-grid');
-      const emptyState = document.getElementById('empty-state');
-      const sortBy = document.getElementById('sort-select').value;
+      const emptyEl = document.getElementById('empty-state');
+      const query = document.getElementById('search-input').value.trim().toLowerCase();
+      const sortMode = document.getElementById('sort-select').value;
+      const totalInProfile = appDb.profiles[activeProfile].items.length;
 
-      let filtered = items.filter(item => {
-        const matchesStatus = activeStatus === 'All Pieces' || item.status === activeStatus;
-        const matchesCat = activeCategory === 'All' || item.category === activeCategory;
-        const q = searchQuery.trim().toLowerCase();
-        const matchesQuery = !q || [item.name, item.batch, item.notes, item.category, item.size]
-          .some(field => (field || '').toLowerCase().includes(q));
-        return matchesStatus && matchesCat && matchesQuery;
+      let list = [...appDb.profiles[activeProfile].items].filter(item => {
+        const matchStatus = activeStatusFilter === 'All' || item.status === activeStatusFilter;
+        const matchCat = activeCategoryFilter === 'All' || item.category === activeCategoryFilter;
+        const matchSearch =
+          !query ||
+          [item.name, item.size, item.notes, item.category, item.status].some(val =>
+            (val || '').toLowerCase().includes(query)
+          );
+        return matchStatus && matchCat && matchSearch;
       });
 
-      if (sortBy === 'price-desc') filtered.sort((a, b) => (b.priceUsd || 0) - (a.priceUsd || 0));
-      if (sortBy === 'price-asc') filtered.sort((a, b) => (a.priceUsd || 0) - (b.priceUsd || 0));
-      if (sortBy === 'weight-desc') filtered.sort((a, b) => (b.weightG || 0) - (a.weightG || 0));
-      if (sortBy === 'savings-desc') {
-        filtered.sort((a, b) => ((b.retailUsd || 0) - (b.priceUsd || 0)) - ((a.retailUsd || 0) - (a.priceUsd || 0)));
-      }
+      if (sortMode === 'price-desc') list.sort((a, b) => (b.priceUsd || 0) - (a.priceUsd || 0));
+      if (sortMode === 'price-asc') list.sort((a, b) => (a.priceUsd || 0) - (b.priceUsd || 0));
+      if (sortMode === 'weight-desc') list.sort((a, b) => (b.weightG || 0) - (a.weightG || 0));
 
-      document.getElementById('stat-filtered-note').textContent =
-        filtered.length === items.length ? 'total in vault' : `showing ${filtered.length}`;
-
-      if (filtered.length === 0) {
+      if (list.length === 0) {
         grid.innerHTML = '';
-        emptyState.classList.remove('hidden');
+        emptyEl.classList.remove('hidden');
+        const clearBtn = document.getElementById('empty-clear-btn');
+        if (totalInProfile > 0) {
+          document.getElementById('empty-state-title').textContent = 'No matching pieces';
+          document.getElementById('empty-state-sub').textContent = 'Try clearing your active status/category filter or search term.';
+          clearBtn.classList.remove('hidden');
+        } else {
+          document.getElementById('empty-state-title').textContent = `${activeProfile}'s vault is empty`;
+          document.getElementById('empty-state-sub').innerHTML =
+            'Click <span class="font-semibold theme-text">+ Add Piece</span> to start building this rotation.';
+          clearBtn.classList.add('hidden');
+        }
         return;
       }
 
-      emptyState.classList.add('hidden');
-      grid.innerHTML = filtered.map(item => {
-        const hasImage = item.image && item.image.trim().length > 0;
-        const hasLink = item.link && item.link.trim().length > 0;
-        const savedUsd = Math.max(0, (Number(item.retailUsd) || 0) - (Number(item.priceUsd) || 0));
+      emptyEl.classList.add('hidden');
+      grid.innerHTML = list
+        .map(item => {
+          const priceUsd = Number(item.priceUsd) || 0;
+          const priceDkk = Math.round(priceUsd * DKK_RATE);
+          const hasImg = item.image && item.image.trim().length > 0;
+          const hasLink = item.link && item.link.trim().length > 0;
 
-        return `
-          <article class="group bg-card hover:bg-cardHover border border-borderDark hover:border-zinc-700 rounded-2xl overflow-hidden flex flex-col transition duration-200 shadow-lg shadow-black/20">
-            <!-- 1:1 Image Frame -->
-            <div class="relative aspect-square bg-[#0e0e12] border-b border-borderDark overflow-hidden">
-              ${
-                hasImage
-                  ? `<img src="${item.image}" alt="${escapeHtml(item.name)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                     <div class="hidden w-full h-full flex-col items-center justify-center p-4 text-center">
-                       ${getCategoryPlaceholderSVG(item.category)}
-                       <span class="text-[11px] text-zinc-500 mt-2">Image unavailable</span>
-                     </div>`
-                  : `<div class="w-full h-full flex flex-col items-center justify-center p-4 text-center bg-gradient-to-b from-[#131318] to-[#0b0b0e]">
-                       ${getCategoryPlaceholderSVG(item.category)}
-                       <button onclick="openModal('${item.id}')" class="mt-3 text-[11px] font-medium text-zinc-400 hover:text-white bg-zinc-800/80 hover:bg-crimson px-2.5 py-1 rounded-lg border border-zinc-700/80 transition">
-                         + Add QC / Photo
-                       </button>
-                     </div>`
-              }
+          return `
+            <article class="group theme-card theme-card-hover border rounded-2xl overflow-hidden flex flex-col transition duration-200 shadow-lg">
+              <div class="relative aspect-square theme-elevated border-b theme-border overflow-hidden">
+                ${
+                  hasImg
+                    ? `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                       <div class="hidden w-full h-full flex-col items-center justify-center p-4 text-center">
+                         ${getCategorySVG(item.category)}
+                         <span class="text-[11px] theme-text-muted mt-2">Image error</span>
+                       </div>`
+                    : `<div class="w-full h-full flex flex-col items-center justify-center p-4 text-center">
+                         ${getCategorySVG(item.category)}
+                         <button onclick="openItemModal('${item.id}')" class="mt-3 text-[11px] font-semibold theme-card border px-2.5 py-1 rounded-lg theme-text-sec hover:opacity-90 transition">
+                           + Add Photo / QC
+                         </button>
+                       </div>`
+                }
 
-              <!-- Top Badges -->
-              <div class="absolute top-2.5 left-2.5 right-2.5 flex items-start justify-between gap-1.5 pointer-events-none">
-                <span class="px-2.5 py-1 rounded-lg text-[10px] font-semibold border backdrop-blur-md ${getStatusBadgeClass(item.status)}">
-                  ${escapeHtml(item.status)}
-                </span>
-                <span class="px-2 py-1 rounded-lg text-[10px] font-semibold bg-black/70 text-zinc-300 border border-white/10 backdrop-blur-md">
-                  ${escapeHtml(item.category)}
-                </span>
-              </div>
-
-              <!-- Bottom Weight / Savings Pill -->
-              <div class="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-[10px] pointer-events-none">
-                ${item.weightG ? `<span class="px-2 py-0.5 rounded-md bg-black/75 text-zinc-300 border border-white/10 backdrop-blur-sm">${item.weightG}g</span>` : '<span></span>'}
-                ${savedUsd > 10 ? `<span class="px-2 py-0.5 rounded-md bg-emerald-950/85 text-emerald-300 border border-emerald-500/30 backdrop-blur-sm">Save $${Math.round(savedUsd)}</span>` : ''}
-              </div>
-            </div>
-
-            <!-- Card Body -->
-            <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
-              <div>
-                <h3 class="font-display font-bold text-sm sm:text-[15px] text-white leading-snug line-clamp-2">
-                  ${escapeHtml(item.name)}
-                </h3>
-
-                <!-- Metadata Chips -->
-                <div class="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-zinc-400">
-                  ${item.size ? `<span class="bg-obsidian px-2 py-0.5 rounded-md border border-borderDark text-zinc-300 font-medium">Size: ${escapeHtml(item.size)}</span>` : ''}
-                  ${item.batch ? `<span class="bg-obsidian px-2 py-0.5 rounded-md border border-borderDark truncate max-w-[160px]">${escapeHtml(item.batch)}</span>` : ''}
+                <div class="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between gap-1.5 pointer-events-none">
+                  <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold backdrop-blur-md ${getStatusBadgeStyle(item.status)}">
+                    ${escapeHtml(item.status)}
+                  </span>
+                  <span class="px-2 py-1 rounded-lg text-[10px] font-semibold bg-black/75 text-zinc-200 border border-white/10 backdrop-blur-md">
+                    ${escapeHtml(item.category)}
+                  </span>
                 </div>
 
-                <!-- Notes -->
-                ${item.notes ? `<p class="mt-2.5 text-xs text-zinc-400 line-clamp-2 leading-relaxed">${escapeHtml(item.notes)}</p>` : ''}
+                <div class="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-[10px] pointer-events-none">
+                  ${item.weightG ? `<span class="px-2 py-0.5 rounded-md bg-black/80 text-zinc-200 border border-white/10">${item.weightG}g</span>` : '<span></span>'}
+                  ${item.size ? `<span class="px-2 py-0.5 rounded-md bg-black/80 text-zinc-200 border border-white/10 font-semibold">Size ${escapeHtml(item.size)}</span>` : ''}
+                </div>
               </div>
 
-              <!-- Price & Action Row -->
-              <div class="pt-3 border-t border-borderDark/80 space-y-2.5">
-                <div class="flex items-baseline justify-between">
-                  <div class="font-display font-bold text-base text-white">
-                    ${formatPrice(item.priceUsd)}
+              <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+                <div>
+                  <h3 class="font-display font-bold text-sm sm:text-[15px] theme-text leading-snug line-clamp-2">
+                    ${escapeHtml(item.name)}
+                  </h3>
+                  ${item.notes ? `<p class="mt-2 text-xs theme-text-sec line-clamp-2 leading-relaxed">${escapeHtml(item.notes)}</p>` : ''}
+                </div>
+
+                <div class="pt-3 border-t theme-border space-y-2.5">
+                  <div class="flex items-baseline justify-between">
+                    <div class="font-display font-bold text-base theme-text">
+                      ${priceUsd > 0 ? `$${priceUsd.toFixed(2)}` : 'Owned'}
+                      ${priceUsd > 0 ? `<span class="text-xs font-normal theme-text-muted ml-1">(${priceDkk} DKK)</span>` : ''}
+                    </div>
                   </div>
-                  ${item.retailUsd ? `<span class="text-[11px] text-zinc-500 line-through">Retail $${item.retailUsd}</span>` : ''}
-                </div>
 
-                <div class="flex items-center gap-2">
-                  ${
-                    hasLink
-                      ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer" class="flex-1 inline-flex items-center justify-center gap-1.5 bg-crimson hover:bg-crimsonDark text-white text-xs font-semibold py-2 px-3 rounded-xl transition">
-                           <span>Open Link</span>
-                           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                         </a>`
-                      : `<button onclick="openModal('${item.id}')" class="flex-1 inline-flex items-center justify-center gap-1.5 bg-zinc-800/90 hover:bg-zinc-700 text-zinc-300 text-xs font-medium py-2 px-3 rounded-xl border border-zinc-700/70 transition">
-                           <span>+ Add Link</span>
-                         </button>`
-                  }
+                  <div class="flex items-center gap-2">
+                    ${
+                      hasLink
+                        ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer" class="btn-accent flex-1 py-2 px-3 rounded-xl text-xs inline-flex items-center justify-center gap-1.5 transition">
+                             <span>Open Link</span>
+                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                           </a>`
+                        : `<button onclick="openItemModal('${item.id}')" class="theme-elevated border flex-1 py-2 px-3 rounded-xl text-xs font-semibold theme-text-sec hover:opacity-90 transition">
+                             + Add Link
+                           </button>`
+                    }
 
-                  <button onclick="openModal('${item.id}')" title="Edit Piece" class="p-2 rounded-xl bg-obsidian hover:bg-zinc-800 text-zinc-400 hover:text-white border border-borderDark transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                  </button>
+                    <button onclick="openItemModal('${item.id}')" title="Edit" class="theme-elevated border p-2 rounded-xl theme-text-sec hover:theme-text transition">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
 
-                  <button onclick="confirmDelete('${item.id}')" title="Delete Piece" class="p-2 rounded-xl bg-obsidian hover:bg-rose-950/60 text-zinc-400 hover:text-rose-400 border border-borderDark transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
+                    <button onclick="promptDeleteItem('${item.id}')" title="Delete" class="theme-elevated border p-2 rounded-xl theme-text-sec hover:text-rose-400 transition">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </article>
-        `;
-      }).join('');
+            </article>
+          `;
+        })
+        .join('');
     }
 
-    // Escape HTML to prevent XSS
+    // =========================================================================
+    // FIT CHECK STUDIO (OUTFIT BUILDER)
+    // =========================================================================
+    function populateFitCheckDropdowns() {
+      const items = appDb.profiles[activeProfile].items;
+      document.getElementById('fit-owner-name').textContent = activeProfile;
+
+      const tops = items.filter(i => i.category === 'Outerwear' || i.category === 'Tops');
+      const denims = items.filter(i => i.category === 'Denim');
+      const accs = items.filter(i => i.category === 'Accessories');
+      const shoes = items.filter(i => i.category === 'Footwear');
+
+      fillSelect('fit-slot-top', tops, 'No Outerwear/Tops');
+      fillSelect('fit-slot-denim', denims, 'No Denim');
+      fillSelect('fit-slot-acc', accs, 'No Accessories');
+      fillSelect('fit-slot-shoes', shoes, 'No Footwear');
+    }
+
+    function fillSelect(selectId, list, emptyLabel) {
+      const el = document.getElementById(selectId);
+      const prev = el.value;
+      if (list.length === 0) {
+        el.innerHTML = `<option value="" class="bg-zinc-900">${emptyLabel}</option>`;
+        return;
+      }
+      el.innerHTML = list
+        .map(item => `<option value="${item.id}" class="bg-zinc-900">${escapeHtml(item.name)}</option>`)
+        .join('');
+      if (list.some(i => i.id === prev)) {
+        el.value = prev;
+      }
+    }
+
+    function randomizeFit() {
+      ['fit-slot-top', 'fit-slot-denim', 'fit-slot-acc', 'fit-slot-shoes'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.options.length > 0) {
+          el.selectedIndex = Math.floor(Math.random() * el.options.length);
+        }
+      });
+      renderFitPreview();
+    }
+
+    function renderFitPreview() {
+      const items = appDb.profiles[activeProfile].items;
+      const slots = [
+        { label: 'Outerwear / Top', id: document.getElementById('fit-slot-top').value, fallbackCat: 'Outerwear' },
+        { label: 'Denim', id: document.getElementById('fit-slot-denim').value, fallbackCat: 'Denim' },
+        { label: 'Accessory', id: document.getElementById('fit-slot-acc').value, fallbackCat: 'Accessories' },
+        { label: 'Footwear', id: document.getElementById('fit-slot-shoes').value, fallbackCat: 'Footwear' }
+      ];
+
+      let totalUsd = 0;
+      const previewGrid = document.getElementById('fit-preview-grid');
+
+      previewGrid.innerHTML = slots
+        .map(slot => {
+          const item = items.find(i => i.id === slot.id);
+          if (!item) {
+            return `
+              <div class="theme-elevated border rounded-2xl p-4 flex flex-col items-center justify-center text-center min-h-[220px]">
+                ${getCategorySVG(slot.fallbackCat)}
+                <p class="text-xs font-semibold theme-text-sec mt-2">${slot.label}</p>
+                <p class="text-[11px] theme-text-muted mt-0.5">Add pieces in this category</p>
+              </div>
+            `;
+          }
+
+          const price = Number(item.priceUsd) || 0;
+          totalUsd += price;
+          const hasImg = item.image && item.image.trim().length > 0;
+
+          return `
+            <div class="theme-elevated border rounded-2xl overflow-hidden flex flex-col">
+              <div class="aspect-square bg-black/30 relative overflow-hidden border-b theme-border">
+                ${
+                  hasImg
+                    ? `<img src="${escapeHtml(item.image)}" class="w-full h-full object-cover" />`
+                    : `<div class="w-full h-full flex flex-col items-center justify-center p-3">
+                         ${getCategorySVG(item.category)}
+                         <span class="text-[10px] theme-text-muted mt-1.5">${slot.label}</span>
+                       </div>`
+                }
+                <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md text-[10px] font-bold bg-black/75 text-white border border-white/10">
+                  ${slot.label}
+                </span>
+              </div>
+              <div class="p-3 space-y-1">
+                <p class="font-display font-bold text-xs sm:text-sm theme-text line-clamp-1">${escapeHtml(item.name)}</p>
+                <p class="text-[11px] theme-text-sec">
+                  ${price > 0 ? `$${price.toFixed(2)} (${Math.round(price * DKK_RATE)} DKK)` : 'Owned'}
+                  ${item.size ? ` • Size ${escapeHtml(item.size)}` : ''}
+                </p>
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+
+      document.getElementById('fit-total-cost').textContent = `$${totalUsd.toFixed(2)} (${Math.round(totalUsd * DKK_RATE)} DKK)`;
+    }
+
+    async function saveOutfitPreset() {
+      const nameInput = document.getElementById('fit-preset-name');
+      const fitName = nameInput.value.trim() || `Fit #${appDb.profiles[activeProfile].outfits.length + 1}`;
+
+      const newFit = {
+        id: 'fit-' + Date.now(),
+        name: fitName,
+        topId: document.getElementById('fit-slot-top').value,
+        denimId: document.getElementById('fit-slot-denim').value,
+        accId: document.getElementById('fit-slot-acc').value,
+        shoesId: document.getElementById('fit-slot-shoes').value
+      };
+
+      appDb.profiles[activeProfile].outfits.unshift(newFit);
+      nameInput.value = '';
+      renderAll();
+      await persistAndSync();
+    }
+
+    function renderSavedOutfits() {
+      const outfits = appDb.profiles[activeProfile].outfits;
+      const items = appDb.profiles[activeProfile].items;
+      const container = document.getElementById('saved-fits-grid');
+      document.getElementById('saved-fits-count').textContent = `${outfits.length} saved`;
+
+      if (outfits.length === 0) {
+        container.innerHTML = `
+          <div class="theme-card border rounded-2xl p-6 text-center col-span-full">
+            <p class="text-xs theme-text-sec">No saved outfits for ${escapeHtml(activeProfile)} yet. Pick pieces above and click <strong>Save Outfit Preset</strong>.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = outfits
+        .map(fit => {
+          const pieces = [fit.topId, fit.denimId, fit.accId, fit.shoesId]
+            .map(id => items.find(i => i.id === id))
+            .filter(Boolean);
+          const fitUsd = pieces.reduce((s, p) => s + (Number(p.priceUsd) || 0), 0);
+
+          return `
+            <div class="theme-card border rounded-2xl p-4 space-y-3">
+              <div class="flex items-center justify-between gap-2">
+                <div>
+                  <h4 class="font-display font-bold text-sm theme-text">${escapeHtml(fit.name)}</h4>
+                  <p class="text-[11px] theme-text-sec">$${fitUsd.toFixed(2)} (${Math.round(fitUsd * DKK_RATE)} DKK)</p>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="loadOutfitIntoStudio('${fit.id}')" class="theme-elevated border px-2.5 py-1.5 rounded-lg text-[11px] font-semibold theme-text hover:opacity-90">
+                    Load
+                  </button>
+                  <button onclick="deleteOutfitPreset('${fit.id}')" class="theme-elevated border p-1.5 rounded-lg theme-text-sec hover:text-rose-400">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-4 gap-2">
+                ${pieces
+                  .map(
+                    p => `
+                  <div class="theme-elevated border rounded-xl p-2 text-center">
+                    <div class="aspect-square rounded-lg overflow-hidden bg-black/30 flex items-center justify-center mb-1.5">
+                      ${
+                        p.image
+                          ? `<img src="${escapeHtml(p.image)}" class="w-full h-full object-cover" />`
+                          : getCategorySVG(p.category)
+                      }
+                    </div>
+                    <p class="text-[10px] font-medium theme-text line-clamp-1">${escapeHtml(p.name)}</p>
+                  </div>
+                `
+                  )
+                  .join('')}
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+
+    function loadOutfitIntoStudio(fitId) {
+      const fit = appDb.profiles[activeProfile].outfits.find(f => f.id === fitId);
+      if (!fit) return;
+      if (fit.topId) document.getElementById('fit-slot-top').value = fit.topId;
+      if (fit.denimId) document.getElementById('fit-slot-denim').value = fit.denimId;
+      if (fit.accId) document.getElementById('fit-slot-acc').value = fit.accId;
+      if (fit.shoesId) document.getElementById('fit-slot-shoes').value = fit.shoesId;
+      renderFitPreview();
+      showToast(`Loaded "${fit.name}"`);
+    }
+
+    async function deleteOutfitPreset(fitId) {
+      appDb.profiles[activeProfile].outfits = appDb.profiles[activeProfile].outfits.filter(f => f.id !== fitId);
+      renderAll();
+      await persistAndSync();
+    }
+
+    // =========================================================================
+    // ADD / EDIT / DELETE PIECE MODAL & IMAGE COMPRESSION
+    // =========================================================================
+    function openItemModal(itemId = null) {
+      const form = document.getElementById('item-form');
+      form.reset();
+      uploadedImageBase64 = '';
+
+      if (itemId) {
+        const item = appDb.profiles[activeProfile].items.find(i => i.id === itemId);
+        if (!item) return;
+        document.getElementById('item-modal-title').textContent = `Edit Piece (${activeProfile})`;
+        document.getElementById('item-id').value = item.id;
+        document.getElementById('item-name').value = item.name || '';
+        document.getElementById('item-category').value = item.category || 'Outerwear';
+        document.getElementById('item-status').value = item.status || 'Next Haul';
+        document.getElementById('item-price').value = item.priceUsd ?? '';
+        document.getElementById('item-weight').value = item.weightG ?? '';
+        document.getElementById('item-size').value = item.size || '';
+        document.getElementById('item-link').value = item.link || '';
+        document.getElementById('item-notes').value = item.notes || '';
+
+        if (item.image) {
+          if (item.image.startsWith('data:')) {
+            uploadedImageBase64 = item.image;
+          } else {
+            document.getElementById('item-image-url').value = item.image;
+          }
+          setPreviewBox(item.image);
+        } else {
+          setPreviewBox('');
+        }
+      } else {
+        document.getElementById('item-modal-title').textContent = `Add Piece to ${activeProfile}`;
+        document.getElementById('item-id').value = '';
+        if (activeStatusFilter !== 'All') document.getElementById('item-status').value = activeStatusFilter;
+        if (activeCategoryFilter !== 'All') document.getElementById('item-category').value = activeCategoryFilter;
+        setPreviewBox('');
+      }
+
+      document.getElementById('item-modal').classList.remove('hidden');
+    }
+
+    function closeItemModal() {
+      document.getElementById('item-modal').classList.add('hidden');
+    }
+
+    function setPreviewBox(src) {
+      const box = document.getElementById('item-img-preview');
+      box.innerHTML = src ? `<img src="${src}" class="w-full h-full object-cover" />` : 'No Photo';
+    }
+
+    function previewImageUrl(url) {
+      uploadedImageBase64 = '';
+      setPreviewBox(url.trim());
+    }
+
+    function handleScreenshotUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+          const MAX_W = 600;
+          let w = img.width;
+          let h = img.height;
+          if (w > MAX_W) {
+            h = Math.round((h * MAX_W) / w);
+            w = MAX_W;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const compressed = canvas.toDataURL('image/jpeg', 0.76);
+          uploadedImageBase64 = compressed;
+          document.getElementById('item-image-url').value = '';
+          setPreviewBox(compressed);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function handleSaveItem(event) {
+      event.preventDefault();
+      const id = document.getElementById('item-id').value;
+      const urlVal = document.getElementById('item-image-url').value.trim();
+
+      const itemObj = {
+        id: id || `item-${Date.now()}`,
+        name: document.getElementById('item-name').value.trim(),
+        category: document.getElementById('item-category').value,
+        status: document.getElementById('item-status').value,
+        priceUsd: parseFloat(document.getElementById('item-price').value) || 0,
+        weightG: parseInt(document.getElementById('item-weight').value, 10) || 0,
+        size: document.getElementById('item-size').value.trim(),
+        link: document.getElementById('item-link').value.trim(),
+        image: uploadedImageBase64 || urlVal,
+        notes: document.getElementById('item-notes').value.trim()
+      };
+
+      const list = appDb.profiles[activeProfile].items;
+      if (id) {
+        const idx = list.findIndex(i => i.id === id);
+        if (idx !== -1) list[idx] = itemObj;
+      } else {
+        list.unshift(itemObj);
+      }
+
+      closeItemModal();
+      renderAll();
+      await persistAndSync();
+    }
+
+    function promptDeleteItem(itemId) {
+      const item = appDb.profiles[activeProfile].items.find(i => i.id === itemId);
+      if (!item) return;
+      document.getElementById('confirm-title').textContent = 'Remove Piece?';
+      document.getElementById('confirm-msg').textContent = `Delete "${item.name}" from ${activeProfile}'s vault?`;
+      document.getElementById('confirm-ok-btn').onclick = async () => {
+        appDb.profiles[activeProfile].items = appDb.profiles[activeProfile].items.filter(i => i.id !== itemId);
+        closeConfirmModal();
+        renderAll();
+        await persistAndSync();
+      };
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirm-modal').classList.add('hidden');
+    }
+
+    // =========================================================================
+    // UTILITIES
+    // =========================================================================
     function escapeHtml(str) {
       if (!str) return '';
       return String(str)
@@ -985,262 +2001,22 @@
         .replace(/"/g, '&quot;');
     }
 
-    // Modal Open / Close / Save
-    function openModal(itemId = null) {
-      const modal = document.getElementById('piece-modal');
-      const form = document.getElementById('piece-form');
-      form.reset();
-      currentModalImageBase64 = '';
-
-      if (itemId) {
-        const item = items.find(i => i.id === itemId);
-        if (!item) return;
-        document.getElementById('modal-title').textContent = 'Edit Piece';
-        document.getElementById('field-id').value = item.id;
-        document.getElementById('field-name').value = item.name || '';
-        document.getElementById('field-category').value = item.category || 'Footwear';
-        document.getElementById('field-status').value = item.status || 'Next Haul ($250)';
-        document.getElementById('field-price').value = item.priceUsd ?? '';
-        document.getElementById('field-retail').value = item.retailUsd ?? '';
-        document.getElementById('field-weight').value = item.weightG ?? '';
-        document.getElementById('field-size').value = item.size || '';
-        document.getElementById('field-batch').value = item.batch || '';
-        document.getElementById('field-link').value = item.link || '';
-        document.getElementById('field-notes').value = item.notes || '';
-
-        if (item.image) {
-          if (item.image.startsWith('data:')) {
-            currentModalImageBase64 = item.image;
-          } else {
-            document.getElementById('field-image-url').value = item.image;
-          }
-          setModalPreview(item.image);
-        } else {
-          setModalPreview('');
-        }
-      } else {
-        document.getElementById('modal-title').textContent = 'Add New Piece';
-        document.getElementById('field-id').value = '';
-        if (activeStatus !== 'All Pieces') {
-          document.getElementById('field-status').value = activeStatus;
-        }
-        if (activeCategory !== 'All') {
-          document.getElementById('field-category').value = activeCategory;
-        }
-        setModalPreview('');
-      }
-
-      modal.classList.remove('hidden');
+    function escapeAttr(str) {
+      return escapeHtml(str).replace(/'/g, "\\'");
     }
 
-    function closeModal() {
-      document.getElementById('piece-modal').classList.add('hidden');
-    }
-
-    function setModalPreview(src) {
-      const box = document.getElementById('modal-img-preview');
-      if (src) {
-        box.innerHTML = `<img src="${src}" class="w-full h-full object-cover" />`;
-      } else {
-        box.innerHTML = 'No Photo';
-      }
-    }
-
-    function updatePreviewFromUrl(url) {
-      currentModalImageBase64 = '';
-      setModalPreview(url.trim());
-    }
-
-    // Compress uploaded screenshot/image via HTML5 Canvas so localStorage stays super light
-    function handleImageUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const img = new Image();
-        img.onload = function () {
-          const MAX_DIM = 600;
-          let width = img.width;
-          let height = img.height;
-          if (width > height && width > MAX_DIM) {
-            height = Math.round((height * MAX_DIM) / width);
-            width = MAX_DIM;
-          } else if (height > MAX_DIM) {
-            width = Math.round((width * MAX_DIM) / height);
-            height = MAX_DIM;
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.78);
-          currentModalImageBase64 = compressedDataUrl;
-          document.getElementById('field-image-url').value = '';
-          setModalPreview(compressedDataUrl);
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function savePiece(event) {
-      event.preventDefault();
-      const id = document.getElementById('field-id').value;
-      const imageUrlInput = document.getElementById('field-image-url').value.trim();
-      const finalImage = currentModalImageBase64 || imageUrlInput;
-
-      const pieceData = {
-        id: id || 'item-' + Date.now(),
-        name: document.getElementById('field-name').value.trim(),
-        category: document.getElementById('field-category').value,
-        status: document.getElementById('field-status').value,
-        priceUsd: parseFloat(document.getElementById('field-price').value) || 0,
-        retailUsd: parseFloat(document.getElementById('field-retail').value) || 0,
-        weightG: parseInt(document.getElementById('field-weight').value, 10) || 0,
-        size: document.getElementById('field-size').value.trim(),
-        batch: document.getElementById('field-batch').value.trim(),
-        link: document.getElementById('field-link').value.trim(),
-        image: finalImage,
-        notes: document.getElementById('field-notes').value.trim()
-      };
-
-      if (id) {
-        const idx = items.findIndex(i => i.id === id);
-        if (idx !== -1) items[idx] = pieceData;
-        showToast('Piece updated.');
-      } else {
-        items.unshift(pieceData);
-        showToast('New piece added to vault.');
-      }
-
-      saveItemsToStorage();
-      renderFilters();
-      updateStats();
-      renderGrid();
-      closeModal();
-    }
-
-    // Custom Confirm Dialog (Delete & Reset)
-    function confirmDelete(itemId) {
-      const item = items.find(i => i.id === itemId);
-      if (!item) return;
-      document.getElementById('confirm-title').textContent = 'Delete Piece?';
-      document.getElementById('confirm-message').textContent = `Remove "${item.name}" from your catalog?`;
-      const btn = document.getElementById('confirm-action-btn');
-      btn.onclick = () => {
-        items = items.filter(i => i.id !== itemId);
-        saveItemsToStorage();
-        renderFilters();
-        updateStats();
-        renderGrid();
-        closeConfirmModal();
-        showToast('Piece removed.');
-      };
-      document.getElementById('confirm-modal').classList.remove('hidden');
-    }
-
-    function openResetConfirm() {
-      toggleSyncMenu(false);
-      document.getElementById('confirm-title').textContent = 'Reset to Starter Catalog?';
-      document.getElementById('confirm-message').textContent = 'This will restore the original 18 pre-loaded items and overwrite custom edits.';
-      const btn = document.getElementById('confirm-action-btn');
-      btn.onclick = () => {
-        items = JSON.parse(JSON.stringify(defaultItems));
-        saveItemsToStorage();
-        renderFilters();
-        updateStats();
-        renderGrid();
-        closeConfirmModal();
-        showToast('Catalog reset to starter items.');
-      };
-      document.getElementById('confirm-modal').classList.remove('hidden');
-    }
-
-    function closeConfirmModal() {
-      document.getElementById('confirm-modal').classList.add('hidden');
-    }
-
-    // Sync Dropdown & JSON Export/Import
-    function toggleSyncMenu(forceState = null) {
-      const dd = document.getElementById('sync-dropdown');
-      if (forceState === false) {
-        dd.classList.add('hidden');
-      } else {
-        dd.classList.toggle('hidden');
-      }
-    }
-
-    function exportJSON() {
-      toggleSyncMenu(false);
-      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(items, null, 2));
-      const dlAnchor = document.createElement('a');
-      dlAnchor.setAttribute('href', dataStr);
-      dlAnchor.setAttribute('download', `vault-archive-backup-${new Date().toISOString().slice(0, 10)}.json`);
-      document.body.appendChild(dlAnchor);
-      dlAnchor.click();
-      dlAnchor.remove();
-      showToast('Backup JSON downloaded.');
-    }
-
-    function importJSON(event) {
-      toggleSyncMenu(false);
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        try {
-          const imported = JSON.parse(e.target.result);
-          if (!Array.isArray(imported)) throw new Error('Invalid JSON structure');
-          items = imported;
-          saveItemsToStorage();
-          renderFilters();
-          updateStats();
-          renderGrid();
-          showToast(`Imported ${items.length} pieces!`);
-        } catch (err) {
-          showToast('Invalid backup file.', 'error');
-        }
-      };
-      reader.readAsText(file);
-      event.target.value = '';
-    }
-
-    // Toast Feedback Helper
-    function showToast(message, type = 'success') {
+    function showToast(msg, type = 'success') {
       const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      const accent = type === 'error' ? 'border-rose-500/50 text-rose-200' : 'border-emerald-500/40 text-zinc-100';
-      toast.className = `bg-card border ${accent} px-4 py-2.5 rounded-xl shadow-2xl text-xs font-medium backdrop-blur-md transition-opacity duration-300`;
-      toast.textContent = message;
-      container.appendChild(toast);
+      const el = document.createElement('div');
+      const borderClass = type === 'error' ? 'border-rose-500/60 text-rose-200' : 'theme-border theme-text';
+      el.className = `theme-card border ${borderClass} px-4 py-2.5 rounded-xl shadow-2xl text-xs font-semibold backdrop-blur-md transition-opacity duration-300`;
+      el.textContent = msg;
+      container.appendChild(el);
       setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 300);
-      }, 2600);
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 300);
+      }, 2800);
     }
-
-    // Search Listener & Outside Click Handler
-    document.getElementById('search-input').addEventListener('input', (e) => {
-      searchQuery = e.target.value;
-      renderGrid();
-    });
-
-    document.addEventListener('click', (e) => {
-      const syncBtn = document.getElementById('sync-menu-btn');
-      const syncDd = document.getElementById('sync-dropdown');
-      if (syncBtn && syncDd && !syncBtn.contains(e.target) && !syncDd.contains(e.target)) {
-        syncDd.classList.add('hidden');
-      }
-    });
-
-    // Initialize App on Load
-    window.addEventListener('DOMContentLoaded', () => {
-      loadItems();
-      renderFilters();
-      updateStats();
-      renderGrid();
-    });
   </script>
 </body>
 </html>
