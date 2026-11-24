@@ -360,7 +360,7 @@
       <!-- VIEW 1: CATALOG & HAUL TRACKER                            -->
       <!-- ========================================================= -->
       <main id="catalog-view" class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
-        <!-- Smart DHL Tax-Free Shipping & Weight Estimator Bar -->
+        <!-- Smart DHL Tax-Free Shipping Estimator Bar (300 DKK Base on 1st Item) -->
         <section class="theme-card border rounded-2xl p-4 sm:p-5 shadow-xl">
           <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div class="space-y-2.5">
@@ -384,21 +384,24 @@
                   </button>
                 </div>
 
-                <label class="inline-flex items-center gap-2 cursor-pointer theme-elevated border px-3 py-1.5 rounded-xl text-xs font-medium select-none">
+                <label class="inline-flex items-center gap-2 theme-elevated border px-3 py-1.5 rounded-xl text-xs font-medium select-none">
+                  <span class="theme-text-sec">Extra item:</span>
+                  <span class="theme-text font-bold">+</span>
                   <input
-                    type="checkbox"
-                    id="drop-boxes-toggle"
-                    checked
-                    onchange="updateDhlBar()"
-                    class="w-3.5 h-3.5 rounded accent-rose-600 cursor-pointer"
+                    type="number"
+                    id="extra-item-dkk"
+                    min="0"
+                    step="5"
+                    value="60"
+                    oninput="handleExtraRateChange()"
+                    class="w-12 bg-black/30 border theme-border rounded-md px-1.5 py-0.5 text-xs font-bold theme-text text-center outline-none"
                   />
-                  <span class="theme-text">Drop Shoeboxes</span>
-                  <span class="theme-text-muted text-[11px]">(-350g / pair)</span>
+                  <span class="theme-text-muted text-[11px]">DKK / pc</span>
                 </label>
               </div>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 lg:min-w-[520px]">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:min-w-[490px]">
               <div class="theme-elevated border rounded-xl p-3">
                 <p class="text-[10px] uppercase tracking-wider theme-text-muted font-semibold">Items Subtotal</p>
                 <p id="dhl-items-usd" class="font-display text-lg font-bold theme-text mt-0.5">$0.00</p>
@@ -406,21 +409,15 @@
               </div>
 
               <div class="theme-elevated border rounded-xl p-3">
-                <p class="text-[10px] uppercase tracking-wider theme-text-muted font-semibold">Est. Weight</p>
-                <p id="dhl-weight" class="font-display text-lg font-bold theme-text mt-0.5">0.00 kg</p>
-                <p id="dhl-weight-sub" class="text-[11px] theme-text-sec">0 g net</p>
-              </div>
-
-              <div class="theme-elevated border rounded-xl p-3">
-                <p class="text-[10px] uppercase tracking-wider theme-text-muted font-semibold">Est. DHL Line</p>
-                <p id="dhl-ship-usd" class="font-display text-lg font-bold" style="color: var(--accent);">~$0</p>
-                <p id="dhl-ship-dkk" class="text-[11px] theme-text-sec">~0 DKK to DK</p>
+                <p class="text-[10px] uppercase tracking-wider theme-text-muted font-semibold">Est. DHL Shipping</p>
+                <p id="dhl-ship-dkk" class="font-display text-lg font-bold mt-0.5" style="color: var(--accent);">0 DKK</p>
+                <p id="dhl-ship-sub" class="text-[11px] theme-text-sec">$0.00 • 300 DKK base</p>
               </div>
 
               <div class="theme-elevated border rounded-xl p-3">
                 <p class="text-[10px] uppercase tracking-wider theme-text-muted font-semibold">All-In Landed</p>
-                <p id="dhl-total-usd" class="font-display text-lg font-bold text-emerald-400">$0.00</p>
-                <p id="dhl-total-dkk" class="text-[11px] theme-text-sec">~0 DKK total</p>
+                <p id="dhl-total-usd" class="font-display text-lg font-bold text-emerald-400 mt-0.5">$0.00</p>
+                <p id="dhl-total-dkk" class="text-[11px] theme-text-sec">0 DKK total</p>
               </div>
             </div>
           </div>
@@ -453,7 +450,7 @@
                 <option value="default" class="bg-zinc-900">Default Order</option>
                 <option value="price-desc" class="bg-zinc-900">Price: High → Low</option>
                 <option value="price-asc" class="bg-zinc-900">Price: Low → High</option>
-                <option value="weight-desc" class="bg-zinc-900">Heaviest First</option>
+                <option value="name-asc" class="bg-zinc-900">Name: A → Z</option>
               </select>
             </div>
           </div>
@@ -573,7 +570,10 @@
         <input type="hidden" id="item-id" />
 
         <div class="space-y-2">
-          <label class="block text-xs font-semibold theme-text-sec">Product or QC Photo</label>
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-semibold theme-text-sec">Product or QC Photo</label>
+            <span class="text-[10px] theme-text-muted">Tip: Press Ctrl+V anywhere here to paste screenshot</span>
+          </div>
           <div class="flex items-center gap-3.5">
             <div id="item-img-preview" class="w-20 h-20 rounded-xl theme-elevated border flex items-center justify-center overflow-hidden shrink-0 text-[10px] theme-text-muted text-center p-1">
               No Photo
@@ -630,14 +630,21 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-3">
+        <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold theme-text-sec mb-1">Price (USD)</label>
-            <input type="number" step="0.01" id="item-price" placeholder="51.63" class="w-full theme-elevated border rounded-xl px-3 py-2 text-xs sm:text-sm theme-text outline-none" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold theme-text-sec mb-1">Weight (g)</label>
-            <input type="number" id="item-weight" placeholder="1100" class="w-full theme-elevated border rounded-xl px-3 py-2 text-xs sm:text-sm theme-text outline-none" />
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-semibold theme-text-sec">Price (USD)</label>
+              <span id="modal-dkk-preview" class="text-[11px] font-semibold theme-text-muted">0 DKK</span>
+            </div>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              id="item-price"
+              placeholder="51.63"
+              oninput="updateModalDkkPreview()"
+              class="w-full theme-elevated border rounded-xl px-3 py-2 text-xs sm:text-sm theme-text outline-none"
+            />
           </div>
           <div>
             <label class="block text-xs font-semibold theme-text-sec mb-1">Size</label>
@@ -837,99 +844,110 @@
     const LOCAL_DB_KEY = 'vault_archive_clean_db_v3';
     const GH_CONFIG_KEY = 'vault_archive_gh_config_v3';
     const THEME_KEY = 'vault_archive_theme_v3';
+    const EXTRA_DKK_KEY = 'vault_archive_extra_dkk_v3';
+    const FIRST_ITEM_SHIPPING_DKK = 300;
+    const DEFAULT_EXTRA_ITEM_DKK = 60;
 
-    // Completely empty clean-slate starter database
-    const cleanStarterDatabase = {
-      profiles: {
-        Mikkel: {
-          color: '#e11d48',
-          items: [],
-          outfits: []
+    function getCleanDefaultDatabase() {
+      return {
+        profiles: {
+          Mikkel: {
+            color: '#e11d48',
+            items: [],
+            outfits: []
+          }
         }
-      }
-    };
+      };
+    }
 
     // =========================================================================
     // APPLICATION STATE
     // =========================================================================
-    let appDb = JSON.parse(JSON.stringify(cleanStarterDatabase));
+    let appDb = getCleanDefaultDatabase();
     let activeProfile = 'Mikkel';
     let activeMainView = 'catalog';
     let activeStatusFilter = 'All';
     let activeCategoryFilter = 'All';
     let dhlScope = 'Next Haul';
     let uploadedImageBase64 = '';
-    let githubFileSha = null;
     let selectedNewBadgeColor = BADGE_COLORS[1];
+    let remoteFileSha = null;
 
     // =========================================================================
     // INITIALIZATION & DATA LOADING
     // =========================================================================
     window.addEventListener('DOMContentLoaded', async () => {
       initTheme();
+      initShippingRate();
       loadLocalFallback();
       loadGitHubConfigUI();
       renderAll();
+
+      // Enable Ctrl+V screenshot paste while Add/Edit modal is open
+      document.addEventListener('paste', handleModalClipboardPaste);
 
       // Pull shared data.json from GitHub if available
       await fetchFromGitHubRepo();
     });
 
-    function initTheme() {
-      const savedTheme = localStorage.getItem(THEME_KEY) || 'crimson-dark';
-      setTheme(savedTheme, false);
+    function initShippingRate() {
+      const savedRate = localStorage.getItem(EXTRA_DKK_KEY);
+      const input = document.getElementById('extra-item-dkk');
+      if (input) {
+        input.value = savedRate !== null ? Math.max(0, parseInt(savedRate, 10) || 0) : DEFAULT_EXTRA_ITEM_DKK;
+      }
     }
 
-    function setTheme(themeName, persist = true) {
-      document.body.setAttribute('data-theme', themeName);
-      const sel = document.getElementById('theme-select');
-      if (sel) sel.value = themeName;
-      if (persist) localStorage.setItem(THEME_KEY, themeName);
+    function handleExtraRateChange() {
+      const input = document.getElementById('extra-item-dkk');
+      const val = Math.max(0, parseInt(input.value, 10) || 0);
+      localStorage.setItem(EXTRA_DKK_KEY, String(val));
+      updateDhlBar();
     }
 
     function loadLocalFallback() {
       try {
-        const cached = localStorage.getItem(LOCAL_DB_KEY);
-        if (cached) {
-          const parsed = JSON.parse(cached);
+        const raw = localStorage.getItem(LOCAL_DB_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
           if (parsed && parsed.profiles && Object.keys(parsed.profiles).length > 0) {
-            appDb = normalizeDatabase(parsed);
+            appDb = parsed;
             if (!appDb.profiles[activeProfile]) {
               activeProfile = Object.keys(appDb.profiles)[0];
             }
           }
         }
-      } catch (err) {
-        console.warn('Local cache read error:', err);
+      } catch (e) {
+        console.warn('Local cache load failed:', e);
       }
     }
 
-    function saveLocalCache() {
+    function saveLocalFallback() {
       try {
         localStorage.setItem(LOCAL_DB_KEY, JSON.stringify(appDb));
-      } catch (err) {
-        showToast('Browser storage full — rely on GitHub Sync or smaller images.', 'error');
+      } catch (e) {
+        showToast('Storage full—try smaller screenshots.', 'error');
       }
-    }
-
-    function normalizeDatabase(raw) {
-      const normalized = { profiles: {} };
-      const entries = Object.entries(raw.profiles || {});
-      if (entries.length === 0) {
-        return JSON.parse(JSON.stringify(cleanStarterDatabase));
-      }
-      entries.forEach(([name, prof], idx) => {
-        normalized.profiles[name] = {
-          color: prof && prof.color ? prof.color : BADGE_COLORS[idx % BADGE_COLORS.length],
-          items: Array.isArray(prof && prof.items) ? prof.items : [],
-          outfits: Array.isArray(prof && prof.outfits) ? prof.outfits : []
-        };
-      });
-      return normalized;
     }
 
     // =========================================================================
-    // SIDEBAR & PROFILE MANAGEMENT (JOIN / ADD YOUR VAULT + SHARE/IMPORT)
+    // THEME SWITCHER
+    // =========================================================================
+    function initTheme() {
+      const saved = localStorage.getItem(THEME_KEY) || 'crimson-dark';
+      setTheme(saved, false);
+    }
+
+    function setTheme(themeName, notify = true) {
+      document.body.setAttribute('data-theme', themeName);
+      const sel = document.getElementById('theme-select');
+      if (sel) sel.value = themeName;
+      localStorage.setItem(THEME_KEY, themeName);
+      if (notify) showToast(`Theme: ${themeName.replace('-', ' ').toUpperCase()}`);
+    }
+
+    // =========================================================================
+    // SIDEBAR & CREW PROFILE MANAGEMENT
     // =========================================================================
     function toggleSidebar(open) {
       const sidebar = document.getElementById('crew-sidebar');
@@ -943,6 +961,13 @@
       }
     }
 
+    function switchProfile(name) {
+      if (!appDb.profiles[name]) return;
+      activeProfile = name;
+      toggleSidebar(false);
+      renderAll();
+    }
+
     function renderCrewSidebar() {
       const listEl = document.getElementById('crew-sidebar-list');
       const names = Object.keys(appDb.profiles);
@@ -951,50 +976,47 @@
       listEl.innerHTML = names
         .map(name => {
           const prof = appDb.profiles[name];
-          const isActive = activeProfile === name;
+          const isActive = name === activeProfile;
+          const color = prof.color || '#e11d48';
+          const itemCount = (prof.items || []).length;
+
           return `
             <button
               onclick="switchProfile('${escapeAttr(name)}')"
               class="w-full px-3 py-2.5 rounded-xl border text-left flex items-center justify-between transition ${
-                isActive ? 'pill-accent-active shadow-md' : 'theme-elevated border theme-text-sec hover:theme-text'
+                isActive ? 'pill-accent-active shadow-md' : 'theme-elevated theme-border theme-text-sec hover:theme-text'
               }"
             >
               <span class="flex items-center gap-2.5 min-w-0">
-                <span class="w-2.5 h-2.5 rounded-full shrink-0 border border-black/30" style="background-color: ${escapeAttr(prof.color)};"></span>
+                <span class="w-2.5 h-2.5 rounded-full shrink-0 border border-white/20" style="background-color: ${escapeHtml(color)};"></span>
                 <span class="text-xs font-bold truncate">${escapeHtml(name)}</span>
               </span>
-              <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold ${isActive ? 'bg-black/25' : 'theme-card'}">
-                ${prof.items.length}
+              <span class="text-[10px] px-2 py-0.5 rounded-md ${isActive ? 'bg-black/25 text-white' : 'bg-black/30 theme-text-muted'}">
+                ${itemCount}
               </span>
             </button>
           `;
         })
         .join('');
 
-      // Update Top Header Active Profile Info
-      const currentProf = appDb.profiles[activeProfile];
-      document.getElementById('active-profile-dot').style.backgroundColor = currentProf.color;
+      // Update Top Header for Active Profile
+      const activeData = appDb.profiles[activeProfile];
+      document.getElementById('active-profile-dot').style.backgroundColor = activeData.color || '#e11d48';
       document.getElementById('active-profile-title').textContent = `${activeProfile}'s Vault`;
-      document.getElementById('active-profile-sub').textContent = `${currentProf.items.length} pieces • ${currentProf.outfits.length} saved fits`;
+      document.getElementById('active-profile-sub').textContent = `${activeData.items.length} ${activeData.items.length === 1 ? 'piece' : 'pieces'} • ${activeData.outfits.length} saved fits`;
 
+      // Show "Remove" option on added friend vaults (protect Mikkel default)
       const delBtn = document.getElementById('delete-profile-btn');
-      if (names.length > 1 && activeProfile !== 'Mikkel') {
+      if (activeProfile !== 'Mikkel' && names.length > 1) {
         delBtn.classList.remove('hidden');
       } else {
         delBtn.classList.add('hidden');
       }
     }
 
-    function switchProfile(name) {
-      if (!appDb.profiles[name]) return;
-      activeProfile = name;
-      toggleSidebar(false);
-      renderAll();
-    }
-
     function openJoinVaultModal() {
       document.getElementById('new-profile-name').value = '';
-      selectedNewBadgeColor = BADGE_COLORS[Object.keys(appDb.profiles).length % BADGE_COLORS.length];
+      selectedNewBadgeColor = BADGE_COLORS[1];
       renderBadgeColorPicker();
       document.getElementById('join-vault-modal').classList.remove('hidden');
     }
@@ -1006,14 +1028,13 @@
     function renderBadgeColorPicker() {
       const container = document.getElementById('badge-color-picker');
       container.innerHTML = BADGE_COLORS.map(hex => {
-        const selected = selectedNewBadgeColor === hex;
+        const selected = hex === selectedNewBadgeColor;
         return `
           <button
             type="button"
             onclick="selectBadgeColor('${hex}')"
-            class="w-7 h-7 rounded-full transition ${selected ? 'ring-2 ring-white scale-110' : 'opacity-75 hover:opacity-100'}"
+            class="w-7 h-7 rounded-full transition transform ${selected ? 'scale-110 ring-2 ring-white ring-offset-2 ring-offset-zinc-900' : 'opacity-75 hover:opacity-100'}"
             style="background-color: ${hex};"
-            aria-label="Select badge color ${hex}"
           ></button>
         `;
       }).join('');
@@ -1029,14 +1050,12 @@
       const rawName = document.getElementById('new-profile-name').value.trim();
       if (!rawName) return;
 
-      // Case-insensitive duplicate check
       const existingKey = Object.keys(appDb.profiles).find(k => k.toLowerCase() === rawName.toLowerCase());
       if (existingKey) {
         activeProfile = existingKey;
         closeJoinVaultModal();
-        toggleSidebar(false);
         renderAll();
-        showToast(`Switched to existing vault: ${existingKey}`);
+        showToast(`Switched to ${existingKey}'s existing vault`);
         return;
       }
 
@@ -1045,44 +1064,53 @@
         items: [],
         outfits: []
       };
+
       activeProfile = rawName;
       closeJoinVaultModal();
       toggleSidebar(false);
       renderAll();
-      showToast(`Added ${rawName}'s Vault to sidebar!`);
       await persistAndSync();
+      showToast(`Added ${rawName}'s Vault to sidebar!`);
     }
 
     function promptDeleteProfile() {
-      if (activeProfile === 'Mikkel' || Object.keys(appDb.profiles).length <= 1) return;
+      if (activeProfile === 'Mikkel') return;
       const target = activeProfile;
       document.getElementById('confirm-title').textContent = `Remove ${target}'s Vault?`;
-      document.getElementById('confirm-msg').textContent = `This will remove ${target}'s profile and all items inside it from the sidebar.`;
+      document.getElementById('confirm-msg').textContent = `This will remove ${target}'s tab and items from the sidebar.`;
       document.getElementById('confirm-ok-btn').onclick = async () => {
         delete appDb.profiles[target];
-        activeProfile = Object.keys(appDb.profiles)[0];
+        activeProfile = Object.keys(appDb.profiles)[0] || 'Mikkel';
         closeConfirmModal();
         renderAll();
         await persistAndSync();
+        showToast(`Removed ${target}'s Vault`);
       };
       document.getElementById('confirm-modal').classList.remove('hidden');
     }
 
+    // =========================================================================
+    // PROFILE CODE EXPORT & IMPORT (FOR FRIENDS LIKE LUCAS TO SHARE THEIR LIST)
+    // =========================================================================
     function copyCurrentProfileCode() {
-      const prof = appDb.profiles[activeProfile];
       const payload = {
         v: 1,
         name: activeProfile,
-        profile: prof
+        profile: appDb.profiles[activeProfile]
       };
-      const encoded = encodeBase64Unicode(JSON.stringify(payload));
-      const tempArea = document.createElement('textarea');
-      tempArea.value = encoded;
-      document.body.appendChild(tempArea);
-      tempArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(tempArea);
-      showToast(`Copied ${activeProfile}'s Profile Code!`);
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+
+      const tempInput = document.createElement('textarea');
+      tempInput.value = encoded;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand('copy');
+        showToast(`Copied ${activeProfile}'s Profile Code!`);
+      } catch (e) {
+        showToast('Could not copy code automatically.', 'error');
+      }
+      document.body.removeChild(tempInput);
     }
 
     function openImportVaultModal() {
@@ -1096,32 +1124,39 @@
 
     async function handleImportProfileCode() {
       const raw = document.getElementById('import-code-input').value.trim();
-      if (!raw) return;
+      if (!raw) {
+        showToast('Paste a Profile Code first.', 'error');
+        return;
+      }
+
       try {
-        const decoded = decodeBase64Unicode(raw);
-        const parsed = JSON.parse(decoded);
-        if (!parsed || !parsed.name || !parsed.profile) {
-          throw new Error('Invalid code format');
+        const decodedJson = decodeURIComponent(escape(atob(raw)));
+        const parsed = JSON.parse(decodedJson);
+
+        if (!parsed || !parsed.name || !parsed.profile || !Array.isArray(parsed.profile.items)) {
+          throw new Error('Invalid code structure');
         }
+
         const friendName = String(parsed.name).trim().slice(0, 20);
         appDb.profiles[friendName] = {
-          color: parsed.profile.color || BADGE_COLORS[Object.keys(appDb.profiles).length % BADGE_COLORS.length],
-          items: Array.isArray(parsed.profile.items) ? parsed.profile.items : [],
-          outfits: Array.isArray(parsed.profile.outfits) ? parsed.profile.outfits : []
+          color: parsed.profile.color || BADGE_COLORS[1],
+          items: parsed.profile.items || [],
+          outfits: parsed.profile.outfits || []
         };
+
         activeProfile = friendName;
         closeImportVaultModal();
         toggleSidebar(false);
         renderAll();
-        showToast(`Imported ${friendName}'s Vault!`);
         await persistAndSync();
+        showToast(`Imported & synced ${friendName}'s Vault!`);
       } catch (err) {
-        showToast('Invalid Profile Code — check that you copied the full text.', 'error');
+        showToast('Invalid Profile Code—make sure the full code was copied.', 'error');
       }
     }
 
     // =========================================================================
-    // DIRECT GITHUB REST API AUTO-SYNC (data.json)
+    // GITHUB DIRECT AUTO-SYNC (data.json)
     // =========================================================================
     function getGitHubConfig() {
       try {
@@ -1142,17 +1177,12 @@
     function updateSyncBadge(state) {
       const dot = document.getElementById('sync-dot');
       const txt = document.getElementById('sync-status-text');
-      if (!dot || !txt) return;
-
       if (state === 'syncing') {
-        dot.className = 'w-2 h-2 rounded-full bg-sky-400 animate-ping';
+        dot.className = 'w-2 h-2 rounded-full bg-sky-400 animate-pulse';
         txt.textContent = 'Syncing...';
-      } else if (state === 'synced') {
+      } else if (state === 'synced' || state === 'ready') {
         dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
-        txt.textContent = 'Synced to GitHub';
-      } else if (state === 'ready') {
-        dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
-        txt.textContent = 'GitHub Ready';
+        txt.textContent = state === 'synced' ? 'GitHub Synced' : 'GitHub Ready';
       } else if (state === 'error') {
         dot.className = 'w-2 h-2 rounded-full bg-rose-500';
         txt.textContent = 'Sync Error';
@@ -1160,133 +1190,6 @@
         dot.className = 'w-2 h-2 rounded-full bg-amber-400';
         txt.textContent = 'Local Mode';
       }
-    }
-
-    async function fetchFromGitHubRepo() {
-      const cfg = getGitHubConfig();
-      try {
-        const relRes = await fetch(`./data.json?t=${Date.now()}`);
-        if (relRes.ok) {
-          const remoteJson = await relRes.json();
-          if (remoteJson && remoteJson.profiles && Object.keys(remoteJson.profiles).length > 0) {
-            appDb = normalizeDatabase(remoteJson);
-            if (!appDb.profiles[activeProfile]) activeProfile = Object.keys(appDb.profiles)[0];
-            saveLocalCache();
-            renderAll();
-          }
-        }
-
-        if (cfg.token) {
-          const apiRes = await fetch(
-            `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/data.json?t=${Date.now()}`,
-            {
-              headers: {
-                Authorization: `Bearer ${cfg.token}`,
-                Accept: 'application/vnd.github+json'
-              }
-            }
-          );
-          if (apiRes.ok) {
-            const fileMeta = await apiRes.json();
-            githubFileSha = fileMeta.sha;
-            if (fileMeta.content) {
-              const decoded = decodeBase64Unicode(fileMeta.content.replace(/\n/g, ''));
-              const parsed = JSON.parse(decoded);
-              if (parsed && parsed.profiles && Object.keys(parsed.profiles).length > 0) {
-                appDb = normalizeDatabase(parsed);
-                if (!appDb.profiles[activeProfile]) activeProfile = Object.keys(appDb.profiles)[0];
-                saveLocalCache();
-                renderAll();
-              }
-            }
-            updateSyncBadge('synced');
-          } else if (apiRes.status === 404) {
-            githubFileSha = null;
-            updateSyncBadge('ready');
-          }
-        }
-      } catch (err) {
-        console.warn('Remote fetch skipped:', err);
-      }
-    }
-
-    async function persistAndSync() {
-      saveLocalCache();
-      const cfg = getGitHubConfig();
-      if (!cfg.token) {
-        updateSyncBadge('local');
-        return;
-      }
-
-      updateSyncBadge('syncing');
-      const apiUrl = `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/data.json`;
-
-      try {
-        const headRes = await fetch(`${apiUrl}?t=${Date.now()}`, {
-          headers: {
-            Authorization: `Bearer ${cfg.token}`,
-            Accept: 'application/vnd.github+json'
-          }
-        });
-        if (headRes.ok) {
-          const meta = await headRes.json();
-          githubFileSha = meta.sha;
-        } else if (headRes.status === 404) {
-          githubFileSha = null;
-        }
-
-        const payload = {
-          message: `Update vault data (${activeProfile})`,
-          content: encodeBase64Unicode(JSON.stringify(appDb, null, 2))
-        };
-        if (githubFileSha) {
-          payload.sha = githubFileSha;
-        }
-
-        const putRes = await fetch(apiUrl, {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${cfg.token}`,
-            Accept: 'application/vnd.github+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (!putRes.ok) {
-          const errData = await putRes.json().catch(() => ({}));
-          throw new Error(errData.message || `HTTP ${putRes.status}`);
-        }
-
-        const result = await putRes.json();
-        if (result.content && result.content.sha) {
-          githubFileSha = result.content.sha;
-        }
-        updateSyncBadge('synced');
-        showToast('Synced to GitHub (data.json)');
-      } catch (err) {
-        console.error('GitHub Sync Error:', err);
-        updateSyncBadge('error');
-        showToast(`GitHub sync failed: ${err.message}`, 'error');
-      }
-    }
-
-    function encodeBase64Unicode(str) {
-      const bytes = new TextEncoder().encode(str);
-      let bin = '';
-      for (let i = 0; i < bytes.length; i++) {
-        bin += String.fromCharCode(bytes[i]);
-      }
-      return btoa(bin);
-    }
-
-    function decodeBase64Unicode(base64) {
-      const bin = atob(base64);
-      const bytes = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) {
-        bytes[i] = bin.charCodeAt(i);
-      }
-      return new TextDecoder().decode(bytes);
     }
 
     function openSyncModal() {
@@ -1302,33 +1205,15 @@
       const owner = document.getElementById('gh-owner').value.trim() || 'krogh245-ux';
       const repo = document.getElementById('gh-repo').value.trim() || 'vault-archive';
       const token = document.getElementById('gh-token').value.trim();
-
       localStorage.setItem(GH_CONFIG_KEY, JSON.stringify({ owner, repo, token }));
       closeSyncModal();
       if (token) {
-        showToast('GitHub token saved — syncing...');
-        await persistAndSync();
+        showToast('Token saved! Syncing with GitHub...');
+        await fetchFromGitHubRepo();
       } else {
         updateSyncBadge('local');
         showToast('Saved in Local Mode.');
       }
-    }
-
-    async function forcePushToGitHub() {
-      const cfg = getGitHubConfig();
-      const tokenInput = document.getElementById('gh-token').value.trim();
-      if (tokenInput) {
-        localStorage.setItem(
-          GH_CONFIG_KEY,
-          JSON.stringify({
-            owner: document.getElementById('gh-owner').value.trim() || cfg.owner,
-            repo: document.getElementById('gh-repo').value.trim() || cfg.repo,
-            token: tokenInput
-          })
-        );
-      }
-      closeSyncModal();
-      await persistAndSync();
     }
 
     function clearGitHubToken() {
@@ -1336,40 +1221,146 @@
       localStorage.setItem(GH_CONFIG_KEY, JSON.stringify({ owner: cfg.owner, repo: cfg.repo, token: '' }));
       document.getElementById('gh-token').value = '';
       updateSyncBadge('local');
+      showToast('Token removed from this browser.');
+    }
+
+    async function fetchFromGitHubRepo() {
+      const cfg = getGitHubConfig();
+      const apiUrl = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/data.json`;
+      const headers = { Accept: 'application/vnd.github+json' };
+      if (cfg.token) headers.Authorization = `Bearer ${cfg.token}`;
+
+      try {
+        const res = await fetch(apiUrl, { headers, cache: 'no-store' });
+        if (res.status === 404) {
+          if (cfg.token) updateSyncBadge('ready');
+          return;
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const fileMeta = await res.json();
+        remoteFileSha = fileMeta.sha;
+        const decoded = decodeURIComponent(escape(atob(fileMeta.content.replace(/\n/g, ''))));
+        const remoteDb = JSON.parse(decoded);
+
+        if (remoteDb && remoteDb.profiles && Object.keys(remoteDb.profiles).length > 0) {
+          appDb = remoteDb;
+          if (!appDb.profiles[activeProfile]) {
+            activeProfile = Object.keys(appDb.profiles)[0];
+          }
+          saveLocalFallback();
+          renderAll();
+          updateSyncBadge(cfg.token ? 'synced' : 'local');
+        }
+      } catch (err) {
+        console.warn('Remote data.json fetch skipped:', err.message);
+        if (cfg.token) updateSyncBadge('error');
+      }
+    }
+
+    async function pushToGitHubRepo() {
+      const cfg = getGitHubConfig();
+      if (!cfg.token) {
+        updateSyncBadge('local');
+        return;
+      }
+
+      updateSyncBadge('syncing');
+      const apiUrl = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/data.json`;
+      const headers = {
+        Accept: 'application/vnd.github+json',
+        Authorization: `Bearer ${cfg.token}`,
+        'Content-Type': 'application/json'
+      };
+
+      try {
+        if (!remoteFileSha) {
+          const checkRes = await fetch(apiUrl, { headers, cache: 'no-store' });
+          if (checkRes.ok) {
+            const existing = await checkRes.json();
+            remoteFileSha = existing.sha;
+          }
+        }
+
+        const jsonStr = JSON.stringify(appDb, null, 2);
+        const base64Content = btoa(unescape(encodeURIComponent(jsonStr)));
+
+        const body = {
+          message: `Sync ${activeProfile}'s vault (${new Date().toLocaleTimeString('da-DK')})`,
+          content: base64Content
+        };
+        if (remoteFileSha) body.sha = remoteFileSha;
+
+        const putRes = await fetch(apiUrl, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify(body)
+        });
+
+        if (!putRes.ok) {
+          const errData = await putRes.json().catch(() => ({}));
+          throw new Error(errData.message || `GitHub API ${putRes.status}`);
+        }
+
+        const result = await putRes.json();
+        remoteFileSha = result.content.sha;
+        updateSyncBadge('synced');
+        showToast('Synced to GitHub!');
+      } catch (err) {
+        console.error('GitHub Sync Error:', err);
+        updateSyncBadge('error');
+        showToast(`Sync failed: ${err.message}`, 'error');
+      }
+    }
+
+    async function forcePushToGitHub() {
       closeSyncModal();
-      showToast('Token removed — switched to Local Mode.');
+      await pushToGitHubRepo();
+    }
+
+    async function persistAndSync() {
+      saveLocalFallback();
+      const cfg = getGitHubConfig();
+      if (cfg.token) {
+        await pushToGitHubRepo();
+      } else {
+        showToast('Saved locally!');
+      }
     }
 
     // =========================================================================
-    // RENDERING & VIEW SWITCHING
+    // VIEW SWITCHING & MASTER RENDER
     // =========================================================================
+    function switchMainView(view) {
+      activeMainView = view;
+      const catTab = document.getElementById('view-tab-catalog');
+      const fitTab = document.getElementById('view-tab-fitcheck');
+      const catView = document.getElementById('catalog-view');
+      const fitView = document.getElementById('fitcheck-view');
+
+      if (view === 'catalog') {
+        catTab.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition pill-accent-active';
+        fitTab.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition theme-text-sec hover:theme-text';
+        catView.classList.remove('hidden');
+        fitView.classList.add('hidden');
+      } else {
+        fitTab.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition pill-accent-active';
+        catTab.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition theme-text-sec hover:theme-text';
+        fitView.classList.remove('hidden');
+        catView.classList.add('hidden');
+        populateFitCheckDropdowns();
+        renderFitPreview();
+        renderSavedOutfits();
+      }
+    }
+
     function renderAll() {
       renderCrewSidebar();
       updateDhlBar();
-      renderFilterPills();
+      renderStatusTabs();
+      renderCategoryPills();
       renderCatalog();
-      populateFitCheckDropdowns();
-      renderFitPreview();
-      renderSavedOutfits();
-    }
-
-    function switchMainView(view) {
-      activeMainView = view;
-      const catView = document.getElementById('catalog-view');
-      const fitView = document.getElementById('fitcheck-view');
-      const tabCat = document.getElementById('view-tab-catalog');
-      const tabFit = document.getElementById('view-tab-fitcheck');
-
-      if (view === 'catalog') {
-        catView.classList.remove('hidden');
-        fitView.classList.add('hidden');
-        tabCat.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition pill-accent-active';
-        tabFit.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition theme-text-sec hover:theme-text';
-      } else {
-        catView.classList.add('hidden');
-        fitView.classList.remove('hidden');
-        tabFit.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition pill-accent-active';
-        tabCat.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition theme-text-sec hover:theme-text';
+      if (activeMainView === 'fitcheck') {
         populateFitCheckDropdowns();
         renderFitPreview();
         renderSavedOutfits();
@@ -1377,7 +1368,7 @@
     }
 
     // =========================================================================
-    // SMART DHL TAX-FREE SHIPPING & WEIGHT ESTIMATOR
+    // SMART DHL TAX-FREE SHIPPING ESTIMATOR (300 DKK FIRST-ITEM BASE)
     // =========================================================================
     function setDhlScope(scope) {
       dhlScope = scope;
@@ -1397,78 +1388,83 @@
       updateDhlBar();
     }
 
-    function estimateDhlDenmarkUsd(grams) {
-      if (grams <= 0) return 0;
-      const kg = grams / 1000;
-      const raw = 22 + Math.max(0, kg - 0.5) * 11.2;
-      return Math.round(raw);
+    function calculateDhlShippingDkk(itemCount) {
+      if (!itemCount || itemCount <= 0) return 0;
+      const extraInput = document.getElementById('extra-item-dkk');
+      const extraPerItemDkk = extraInput ? Math.max(0, parseInt(extraInput.value, 10) || 0) : DEFAULT_EXTRA_ITEM_DKK;
+      return FIRST_ITEM_SHIPPING_DKK + Math.max(0, itemCount - 1) * extraPerItemDkk;
     }
 
     function updateDhlBar() {
       const profileItems = appDb.profiles[activeProfile].items;
-      const dropBoxes = document.getElementById('drop-boxes-toggle').checked;
 
       const scopedItems = profileItems.filter(item => {
         if (dhlScope === 'Both') return item.status === 'Next Haul' || item.status === 'In Warehouse';
         return item.status === dhlScope;
       });
 
-      const itemsUsd = scopedItems.reduce((sum, i) => sum + (Number(i.priceUsd) || 0), 0);
+      const count = scopedItems.length;
+      const itemsUsd = scopedItems.reduce((sum, i) => sum + Math.max(0, Number(i.priceUsd) || 0), 0);
       const itemsDkk = Math.round(itemsUsd * DKK_RATE);
 
-      let totalGrams = scopedItems.reduce((sum, i) => sum + (Number(i.weightG) || 0), 0);
-      if (dropBoxes) {
-        const footwearCount = scopedItems.filter(i => i.category === 'Footwear' && (Number(i.weightG) || 0) > 0).length;
-        totalGrams = Math.max(0, totalGrams - footwearCount * 350);
-      }
+      const shipDkk = calculateDhlShippingDkk(count);
+      const shipUsd = shipDkk / DKK_RATE;
 
-      const shipUsd = estimateDhlDenmarkUsd(totalGrams);
-      const shipDkk = Math.round(shipUsd * DKK_RATE);
       const totalUsd = itemsUsd + shipUsd;
-      const totalDkk = Math.round(totalUsd * DKK_RATE);
+      const totalDkk = itemsDkk + shipDkk;
 
       document.getElementById('dhl-profile-label').textContent = `${activeProfile}'s Parcel (${dhlScope})`;
       document.getElementById('dhl-items-usd').textContent = `$${itemsUsd.toFixed(2)}`;
-      document.getElementById('dhl-items-dkk').textContent = `${itemsDkk.toLocaleString('da-DK')} DKK • ${scopedItems.length} pcs`;
-      document.getElementById('dhl-weight').textContent = `${(totalGrams / 1000).toFixed(2)} kg`;
-      document.getElementById('dhl-weight-sub').textContent = `${totalGrams.toLocaleString()} g ${dropBoxes ? '(no boxes)' : '(boxed)'}`;
-      document.getElementById('dhl-ship-usd').textContent = `~$${shipUsd}`;
-      document.getElementById('dhl-ship-dkk').textContent = `~${shipDkk.toLocaleString('da-DK')} DKK to DK`;
+      document.getElementById('dhl-items-dkk').textContent = `${itemsDkk.toLocaleString('da-DK')} DKK • ${count} ${count === 1 ? 'pc' : 'pcs'}`;
+
+      document.getElementById('dhl-ship-dkk').textContent = `${shipDkk.toLocaleString('da-DK')} DKK`;
+      document.getElementById('dhl-ship-sub').textContent =
+        count === 0
+          ? '$0.00 • 0 pcs in parcel'
+          : count === 1
+            ? `~$${shipUsd.toFixed(2)} • 300 DKK base (1st item)`
+            : `~$${shipUsd.toFixed(2)} • 300 DKK + ${count - 1} extra`;
+
       document.getElementById('dhl-total-usd').textContent = `$${totalUsd.toFixed(2)}`;
-      document.getElementById('dhl-total-dkk').textContent = `~${totalDkk.toLocaleString('da-DK')} DKK total`;
+      document.getElementById('dhl-total-dkk').textContent = `${totalDkk.toLocaleString('da-DK')} DKK total`;
     }
 
     // =========================================================================
-    // CATALOG GRID RENDERING
+    // FILTERS & CATALOG RENDERING
     // =========================================================================
-    function renderFilterPills() {
-      const profileItems = appDb.profiles[activeProfile].items;
-
-      const statusEl = document.getElementById('status-tabs');
-      statusEl.innerHTML = STATUS_OPTIONS.map(st => {
-        const count = st === 'All' ? profileItems.length : profileItems.filter(i => i.status === st).length;
-        const active = activeStatusFilter === st;
+    function renderStatusTabs() {
+      const items = appDb.profiles[activeProfile].items;
+      const container = document.getElementById('status-tabs');
+      container.innerHTML = STATUS_OPTIONS.map(status => {
+        const count = status === 'All' ? items.length : items.filter(i => i.status === status).length;
+        const isActive = activeStatusFilter === status;
         return `
           <button
-            onclick="setStatusFilter('${st}')"
-            class="px-3 py-1.5 rounded-xl text-xs font-semibold border transition flex items-center gap-1.5 shrink-0 ${
-              active ? 'pill-accent-active' : 'theme-card theme-card-hover theme-text-sec'
+            onclick="setStatusFilter('${status}')"
+            class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition flex items-center gap-1.5 border ${
+              isActive
+                ? 'pill-accent-active shadow-md'
+                : 'theme-card theme-border theme-text-sec hover:theme-text'
             }"
           >
-            <span>${st}</span>
-            <span class="text-[10px] px-1.5 rounded-md ${active ? 'bg-black/25' : 'theme-elevated'}">${count}</span>
+            <span>${status}</span>
+            <span class="text-[10px] px-1.5 py-0.2 rounded-md ${isActive ? 'bg-black/25 text-white' : 'bg-black/30 theme-text-muted'}">${count}</span>
           </button>
         `;
       }).join('');
+    }
 
-      const catEl = document.getElementById('category-pills');
-      catEl.innerHTML = CATEGORY_OPTIONS.map(cat => {
-        const active = activeCategoryFilter === cat;
+    function renderCategoryPills() {
+      const container = document.getElementById('category-pills');
+      container.innerHTML = CATEGORY_OPTIONS.map(cat => {
+        const isActive = activeCategoryFilter === cat;
         return `
           <button
             onclick="setCategoryFilter('${cat}')"
-            class="px-3 py-1 rounded-lg text-xs font-medium border transition shrink-0 ${
-              active ? 'bg-white text-zinc-950 border-white font-semibold' : 'theme-card theme-text-sec hover:opacity-90'
+            class="px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition border ${
+              isActive
+                ? 'bg-white text-zinc-950 border-white font-bold'
+                : 'theme-card theme-border theme-text-sec hover:theme-text'
             }"
           >
             ${cat}
@@ -1477,15 +1473,15 @@
       }).join('');
     }
 
-    function setStatusFilter(st) {
-      activeStatusFilter = st;
-      renderFilterPills();
+    function setStatusFilter(status) {
+      activeStatusFilter = status;
+      renderStatusTabs();
       renderCatalog();
     }
 
     function setCategoryFilter(cat) {
       activeCategoryFilter = cat;
-      renderFilterPills();
+      renderCategoryPills();
       renderCatalog();
     }
 
@@ -1493,100 +1489,103 @@
       activeStatusFilter = 'All';
       activeCategoryFilter = 'All';
       document.getElementById('search-input').value = '';
-      renderFilterPills();
+      renderStatusTabs();
+      renderCategoryPills();
       renderCatalog();
     }
 
     function getStatusBadgeStyle(status) {
       switch (status) {
+        case 'In Warehouse':
+          return 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
         case 'Next Haul':
           return 'badge-accent border';
-        case 'In Warehouse':
-          return 'bg-amber-500/15 text-amber-300 border border-amber-500/35';
         case 'Owned':
-          return 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/35';
-        case 'Wishlist':
-          return 'bg-sky-500/15 text-sky-300 border border-sky-500/35';
+          return 'bg-sky-500/20 text-sky-300 border border-sky-500/40';
         default:
-          return 'theme-elevated border theme-text-sec';
+          return 'bg-zinc-800/90 text-zinc-300 border border-zinc-700';
       }
     }
 
-    function getCategorySVG(cat) {
-      const svgs = {
-        Outerwear: `<svg class="w-11 h-11 theme-text-muted" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3l3 2 3-2 5 3-2 5v9a1 1 0 01-1 1H7a1 1 0 01-1-1v-9L4 6l5-3z"/></svg>`,
-        Tops: `<svg class="w-11 h-11 theme-text-muted" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 4l4 2 4-2 4 3-2 4h-2v9H8v-9H6L4 7l4-3z"/></svg>`,
-        Denim: `<svg class="w-11 h-11 theme-text-muted" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3h10l1.5 18h-4.5L12 10l-2 11H5.5L7 3z"/></svg>`,
-        Footwear: `<svg class="w-11 h-11 theme-text-muted" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A1.25 1.25 0 004.25 20h15.5A1.25 1.25 0 0021 18.75v-1.5c0-1.1-.78-2.05-1.86-2.25l-4.64-.85-2.5-3.65H8.5L6.5 14H4.25A1.25 1.25 0 003 15.25v1.25z"/></svg>`,
-        Accessories: `<svg class="w-11 h-11 theme-text-muted" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="2"/><rect x="9" y="7" width="6" height="10" rx="1"/></svg>`
-      };
-      return svgs[cat] || svgs.Outerwear;
+    function getCategorySVG(category) {
+      const color = 'var(--accent)';
+      switch (category) {
+        case 'Outerwear':
+          return `<svg class="w-12 h-12 opacity-60" style="color:${color}" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 3l3-1h6l3 1 3 5-3 2v10a1 1 0 01-1 1H7a1 1 0 01-1-1V10L3 8l3-5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v19"/></svg>`;
+        case 'Denim':
+          return `<svg class="w-12 h-12 opacity-60" style="color:${color}" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3h10l2 18h-5l-2-10-2 10H5L7 3z"/></svg>`;
+        case 'Footwear':
+          return `<svg class="w-12 h-12 opacity-60" style="color:${color}" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v3h16v-3c0-2-2-3-5-3l-3-5H7l-1 5c-1.5.5-2 1.5-2 3z"/></svg>`;
+        case 'Accessories':
+          return `<svg class="w-12 h-12 opacity-60" style="color:${color}" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>`;
+        default:
+          return `<svg class="w-12 h-12 opacity-60" style="color:${color}" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 3h8l4 4-3 3-2-2v13H9V8L7 10 4 7l4-4z"/></svg>`;
+      }
     }
 
     function renderCatalog() {
-      const grid = document.getElementById('items-grid');
-      const emptyEl = document.getElementById('empty-state');
+      const profileItems = appDb.profiles[activeProfile].items;
       const query = document.getElementById('search-input').value.trim().toLowerCase();
       const sortMode = document.getElementById('sort-select').value;
-      const totalInProfile = appDb.profiles[activeProfile].items.length;
+      const grid = document.getElementById('items-grid');
+      const emptyState = document.getElementById('empty-state');
 
-      let list = [...appDb.profiles[activeProfile].items].filter(item => {
+      let list = profileItems.filter(item => {
         const matchStatus = activeStatusFilter === 'All' || item.status === activeStatusFilter;
         const matchCat = activeCategoryFilter === 'All' || item.category === activeCategoryFilter;
-        const matchSearch =
+        const matchQuery =
           !query ||
-          [item.name, item.size, item.notes, item.category, item.status].some(val =>
-            (val || '').toLowerCase().includes(query)
-          );
-        return matchStatus && matchCat && matchSearch;
+          (item.name && item.name.toLowerCase().includes(query)) ||
+          (item.notes && item.notes.toLowerCase().includes(query)) ||
+          (item.size && item.size.toLowerCase().includes(query));
+        return matchStatus && matchCat && matchQuery;
       });
 
       if (sortMode === 'price-desc') list.sort((a, b) => (b.priceUsd || 0) - (a.priceUsd || 0));
       if (sortMode === 'price-asc') list.sort((a, b) => (a.priceUsd || 0) - (b.priceUsd || 0));
-      if (sortMode === 'weight-desc') list.sort((a, b) => (b.weightG || 0) - (a.weightG || 0));
+      if (sortMode === 'name-asc') list.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
       if (list.length === 0) {
         grid.innerHTML = '';
-        emptyEl.classList.remove('hidden');
-        const clearBtn = document.getElementById('empty-clear-btn');
-        if (totalInProfile > 0) {
-          document.getElementById('empty-state-title').textContent = 'No matching pieces';
-          document.getElementById('empty-state-sub').textContent = 'Try clearing your active status/category filter or search term.';
-          clearBtn.classList.remove('hidden');
-        } else {
-          document.getElementById('empty-state-title').textContent = `${activeProfile}'s vault is empty`;
-          document.getElementById('empty-state-sub').innerHTML =
-            'Click <span class="font-semibold theme-text">+ Add Piece</span> to start building this rotation.';
-          clearBtn.classList.add('hidden');
-        }
+        emptyState.classList.remove('hidden');
+        const isFiltered = profileItems.length > 0;
+        document.getElementById('empty-state-title').textContent = isFiltered
+          ? 'No pieces match your filters'
+          : `${activeProfile}'s vault is empty`;
+        document.getElementById('empty-state-sub').innerHTML = isFiltered
+          ? 'Try clearing your search or status filter to view all items.'
+          : 'Click <span class="font-semibold theme-text">+ Add Piece</span> to add your first jacket, jeans, boots, or accessory.';
+        document.getElementById('empty-clear-btn').classList.toggle('hidden', !isFiltered);
         return;
       }
 
-      emptyEl.classList.add('hidden');
+      emptyState.classList.add('hidden');
+
       grid.innerHTML = list
         .map(item => {
           const priceUsd = Number(item.priceUsd) || 0;
           const priceDkk = Math.round(priceUsd * DKK_RATE);
-          const hasImg = item.image && item.image.trim().length > 0;
           const hasLink = item.link && item.link.trim().length > 0;
+          const hasImg = item.image && item.image.trim().length > 0;
 
           return `
-            <article class="group theme-card theme-card-hover border rounded-2xl overflow-hidden flex flex-col transition duration-200 shadow-lg">
-              <div class="relative aspect-square theme-elevated border-b theme-border overflow-hidden">
+            <article class="group theme-card theme-card-hover border rounded-2xl overflow-hidden flex flex-col justify-between transition duration-200 hover:-translate-y-0.5 shadow-lg">
+              <div class="relative aspect-square bg-black/40 overflow-hidden border-b theme-border">
                 ${
                   hasImg
-                    ? `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                       <div class="hidden w-full h-full flex-col items-center justify-center p-4 text-center">
-                         ${getCategorySVG(item.category)}
-                         <span class="text-[11px] theme-text-muted mt-2">Image error</span>
-                       </div>`
-                    : `<div class="w-full h-full flex flex-col items-center justify-center p-4 text-center">
-                         ${getCategorySVG(item.category)}
-                         <button onclick="openItemModal('${item.id}')" class="mt-3 text-[11px] font-semibold theme-card border px-2.5 py-1 rounded-lg theme-text-sec hover:opacity-90 transition">
-                           + Add Photo / QC
-                         </button>
-                       </div>`
+                    ? `<img
+                        src="${escapeHtml(item.image)}"
+                        alt="${escapeHtml(item.name)}"
+                        loading="lazy"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                      />`
+                    : ''
                 }
+                <div style="display: ${hasImg ? 'none' : 'flex'};" class="w-full h-full flex-col items-center justify-center p-4 text-center">
+                  ${getCategorySVG(item.category)}
+                  <span class="mt-2 text-[11px] font-medium theme-text-muted">${escapeHtml(item.category)}</span>
+                </div>
 
                 <div class="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between gap-1.5 pointer-events-none">
                   <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold backdrop-blur-md ${getStatusBadgeStyle(item.status)}">
@@ -1597,10 +1596,13 @@
                   </span>
                 </div>
 
-                <div class="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-[10px] pointer-events-none">
-                  ${item.weightG ? `<span class="px-2 py-0.5 rounded-md bg-black/80 text-zinc-200 border border-white/10">${item.weightG}g</span>` : '<span></span>'}
-                  ${item.size ? `<span class="px-2 py-0.5 rounded-md bg-black/80 text-zinc-200 border border-white/10 font-semibold">Size ${escapeHtml(item.size)}</span>` : ''}
-                </div>
+                ${
+                  item.size
+                    ? `<div class="absolute bottom-2.5 right-2.5 pointer-events-none">
+                         <span class="px-2 py-0.5 rounded-md text-[10px] bg-black/80 text-zinc-200 border border-white/10 font-semibold">Size ${escapeHtml(item.size)}</span>
+                       </div>`
+                    : ''
+                }
               </div>
 
               <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
@@ -1871,10 +1873,10 @@
         document.getElementById('item-category').value = item.category || 'Outerwear';
         document.getElementById('item-status').value = item.status || 'Next Haul';
         document.getElementById('item-price').value = item.priceUsd ?? '';
-        document.getElementById('item-weight').value = item.weightG ?? '';
         document.getElementById('item-size').value = item.size || '';
         document.getElementById('item-link').value = item.link || '';
         document.getElementById('item-notes').value = item.notes || '';
+        updateModalDkkPreview();
 
         if (item.image) {
           if (item.image.startsWith('data:')) {
@@ -1891,10 +1893,17 @@
         document.getElementById('item-id').value = '';
         if (activeStatusFilter !== 'All') document.getElementById('item-status').value = activeStatusFilter;
         if (activeCategoryFilter !== 'All') document.getElementById('item-category').value = activeCategoryFilter;
+        updateModalDkkPreview();
         setPreviewBox('');
       }
 
       document.getElementById('item-modal').classList.remove('hidden');
+    }
+
+    function updateModalDkkPreview() {
+      const usd = Math.max(0, parseFloat(document.getElementById('item-price').value) || 0);
+      const dkk = Math.round(usd * DKK_RATE);
+      document.getElementById('modal-dkk-preview').textContent = `${dkk.toLocaleString('da-DK')} DKK`;
     }
 
     function closeItemModal() {
@@ -1911,9 +1920,8 @@
       setPreviewBox(url.trim());
     }
 
-    function handleScreenshotUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+    function compressAndLoadImageFile(file) {
+      if (!file || !file.type.startsWith('image/')) return;
       const reader = new FileReader();
       reader.onload = function (e) {
         const img = new Image();
@@ -1934,10 +1942,31 @@
           uploadedImageBase64 = compressed;
           document.getElementById('item-image-url').value = '';
           setPreviewBox(compressed);
+          showToast('Screenshot loaded!');
         };
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
+    }
+
+    function handleScreenshotUpload(event) {
+      const file = event.target.files[0];
+      compressAndLoadImageFile(file);
+    }
+
+    function handleModalClipboardPaste(event) {
+      const modal = document.getElementById('item-modal');
+      if (!modal || modal.classList.contains('hidden')) return;
+      const items = (event.clipboardData || window.clipboardData)?.items;
+      if (!items) return;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          const blob = items[i].getAsFile();
+          compressAndLoadImageFile(blob);
+          event.preventDefault();
+          break;
+        }
+      }
     }
 
     async function handleSaveItem(event) {
@@ -1950,8 +1979,7 @@
         name: document.getElementById('item-name').value.trim(),
         category: document.getElementById('item-category').value,
         status: document.getElementById('item-status').value,
-        priceUsd: parseFloat(document.getElementById('item-price').value) || 0,
-        weightG: parseInt(document.getElementById('item-weight').value, 10) || 0,
+        priceUsd: Math.max(0, parseFloat(document.getElementById('item-price').value) || 0),
         size: document.getElementById('item-size').value.trim(),
         link: document.getElementById('item-link').value.trim(),
         image: uploadedImageBase64 || urlVal,
