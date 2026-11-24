@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VAULT // ARCHIVE — Personal Rotation & Haul Catalog</title>
+  <!-- Load Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+          },
+          colors: {
+            obsidian: '#0a0a0c',
+            card: '#121216',
+            cardHover: '#19191f',
+            borderDark: '#24242c',
+            crimson: '#e11d48',
+            crimsonDark: '#be123c',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* Custom scrollbar and subtle chrome/Y2K styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0a0a0c;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #272730;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #e11d48;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .chrome-text {
+      background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body class="bg-obsidian text-zinc-100 min-h-screen antialiased selection:bg-crimson selection:text-white">
+
+  <!-- Toast Notification Banner (Replaces alert/confirm) -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Top Sticky Navigation Header -->
+  <header class="sticky top-0 z-30 bg-obsidian/90 backdrop-blur-md border-b border-borderDark">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <!-- Brand Title & Subtitle -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-crimson to-rose-900 flex items-center justify-center shadow-lg shadow-crimson/20 border border-rose-500/30">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 2L15 8L21 9L17 14L18 20L12 17L6 20L7 14L3 9L9 8L12 2Z" />
+              </svg>
+            </div>
+            <div>
+              <h1 class="font-display font-bold text-lg sm:text-xl tracking-wider chrome-text leading-none">
+                VAULT // ARCHIVE
+              </h1>
+              <p class="text-[11px] text-zinc-500 tracking-wide mt-0.5">PERSONAL HAUL & ROTATION INDEX</p>
+            </div>
+          </div>
+
+          <!-- Mobile Add Button -->
+          <button onclick="openModal()" class="md:hidden inline-flex items-center gap-1.5 bg-crimson hover:bg-crimsonDark text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition shadow-lg shadow-crimson/20">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Piece
+          </button>
+        </div>
+
+        <!-- Search + Currency + Actions -->
+        <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
+          <!-- Search Bar -->
+          <div class="relative flex-1 min-w-[200px] sm:w-64">
+            <svg class="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.15 6.15z" />
+            </svg>
+            <input
+              id="search-input"
+              type="text"
+              placeholder="Search brand, batch, notes..."
+              class="w-full bg-card border border-borderDark focus:border-crimson rounded-xl pl-9 pr-3 py-2 text-xs sm:text-sm text-zinc-100 placeholder-zinc-500 outline-none transition"
+            />
+          </div>
+
+          <!-- Currency Toggle -->
+          <button
+            id="currency-btn"
+            onclick="cycleCurrency()"
+            title="Switch Currency Display"
+            class="bg-card hover:bg-cardHover border border-borderDark text-zinc-300 text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span id="currency-label">USD + DKK</span>
+          </button>
+
+          <!-- Sync / Backup Dropdown Trigger -->
+          <div class="relative">
+            <button
+              id="sync-menu-btn"
+              onclick="toggleSyncMenu()"
+              class="bg-card hover:bg-cardHover border border-borderDark text-zinc-300 text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5"
+            >
+              <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              <span>Sync</span>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div id="sync-dropdown" class="hidden absolute right-0 mt-2 w-52 bg-card border border-borderDark rounded-xl shadow-2xl p-1.5 z-40">
+              <button onclick="exportJSON()" class="w-full text-left px-3 py-2 text-xs text-zinc-200 hover:bg-cardHover rounded-lg flex items-center gap-2 transition">
+                <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Export Backup (.json)
+              </button>
+              <label class="w-full text-left px-3 py-2 text-xs text-zinc-200 hover:bg-cardHover rounded-lg flex items-center gap-2 cursor-pointer transition">
+                <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                Import Backup (.json)
+                <input type="file" id="import-json-input" accept=".json" class="hidden" onchange="importJSON(event)" />
+              </label>
+              <div class="my-1 border-t border-borderDark"></div>
+              <button onclick="openResetConfirm()" class="w-full text-left px-3 py-2 text-xs text-rose-400 hover:bg-rose-950/40 rounded-lg flex items-center gap-2 transition">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Reset to Starter Catalog
+              </button>
+            </div>
+          </div>
+
+          <!-- Desktop Add Button -->
+          <button onclick="openModal()" class="hidden md:inline-flex items-center gap-1.5 bg-crimson hover:bg-crimsonDark text-white text-xs font-semibold px-4 py-2 rounded-xl transition shadow-lg shadow-crimson/20">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Piece
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Live Metrics Dashboard Bar -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div class="bg-card border border-borderDark rounded-2xl p-4">
+        <p class="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold">Total Pieces</p>
+        <div class="mt-1.5 flex items-baseline justify-between">
+          <span id="stat-count" class="font-display text-2xl sm:text-3xl font-bold text-white">0</span>
+          <span id="stat-filtered-note" class="text-[11px] text-zinc-500">in vault</span>
+        </div>
+      </div>
+
+      <div class="bg-card border border-borderDark rounded-2xl p-4">
+        <p class="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold">Next Haul Cart</p>
+        <div class="mt-1.5">
+          <span id="stat-nexthaul-price" class="font-display text-xl sm:text-2xl font-bold text-crimson">$0.00</span>
+          <p id="stat-nexthaul-sub" class="text-[11px] text-zinc-400 mt-0.5">0 DKK • 4 items</p>
+        </div>
+      </div>
+
+      <div class="bg-card border border-borderDark rounded-2xl p-4">
+        <p class="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold">Next Haul Weight</p>
+        <div class="mt-1.5">
+          <span id="stat-nexthaul-weight" class="font-display text-xl sm:text-2xl font-bold text-zinc-100">0.00 kg</span>
+          <p class="text-[11px] text-zinc-400 mt-0.5">Est. no shoeboxes</p>
+        </div>
+      </div>
+
+      <div class="bg-card border border-borderDark rounded-2xl p-4">
+        <p class="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold">Retail Value Saved</p>
+        <div class="mt-1.5">
+          <span id="stat-saved" class="font-display text-xl sm:text-2xl font-bold text-emerald-400">$0</span>
+          <p id="stat-saved-sub" class="text-[11px] text-zinc-400 mt-0.5">vs. buying new retail</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filter Controls (Status Tabs + Category Pills) -->
+    <section class="space-y-3">
+      <!-- Row 1: Status Tabs -->
+      <div id="status-tabs" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Row 2: Category Pills + Sort -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+        <div id="category-pills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="flex items-center gap-2 self-end sm:self-auto">
+          <label for="sort-select" class="text-xs text-zinc-500">Sort:</label>
+          <select id="sort-select" onchange="renderGrid()" class="bg-card border border-borderDark text-xs text-zinc-200 rounded-xl px-3 py-1.5 outline-none focus:border-crimson">
+            <option value="default">Catalog Order</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="weight-desc">Weight: Heaviest First</option>
+            <option value="savings-desc">Biggest Retail Savings</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Product Cards Grid -->
+    <section id="items-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+      <!-- Cards rendered dynamically -->
+    </section>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="hidden bg-card border border-borderDark rounded-2xl p-10 text-center">
+      <p class="font-display text-lg font-bold text-zinc-200">No pieces match your current filter</p>
+      <p class="text-xs text-zinc-500 mt-1">Try clearing your search query or switching status/category tabs.</p>
+      <button onclick="resetFilters()" class="mt-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold px-4 py-2 rounded-xl transition">
+        Reset Filters
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Add / Edit Piece Modal -->
+  <div id="piece-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-card border border-borderDark rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-auto">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-borderDark">
+        <h2 id="modal-title" class="font-display font-bold text-base sm:text-lg text-white">Add New Piece</h2>
+        <button onclick="closeModal()" class="text-zinc-400 hover:text-white p-1 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <form id="piece-form" onsubmit="savePiece(event)" class="p-5 space-y-4 max-h-[82vh] overflow-y-auto">
+        <input type="hidden" id="field-id" />
+
+        <!-- Image Upload / URL Preview Box -->
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-zinc-300">Product / QC Photo</label>
+          <div class="flex items-center gap-3.5">
+            <div id="modal-img-preview" class="w-20 h-20 rounded-xl bg-obsidian border border-borderDark flex items-center justify-center overflow-hidden shrink-0 text-zinc-600 text-[10px] text-center p-1">
+              No Photo
+            </div>
+            <div class="flex-1 space-y-2">
+              <label class="inline-flex items-center gap-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-medium px-3 py-1.5 rounded-lg cursor-pointer transition">
+                <svg class="w-3.5 h-3.5 text-crimson" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Upload Screenshot / Photo
+                <input type="file" id="field-image-file" accept="image/*" class="hidden" onchange="handleImageUpload(event)" />
+              </label>
+              <input
+                type="url"
+                id="field-image-url"
+                placeholder="Or paste direct image URL (https://...)"
+                oninput="updatePreviewFromUrl(this.value)"
+                class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-lg px-2.5 py-1.5 text-xs text-zinc-200 placeholder-zinc-600 outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Item Name -->
+        <div>
+          <label class="block text-xs font-semibold text-zinc-300 mb-1">Item Name *</label>
+          <input
+            type="text"
+            id="field-name"
+            required
+            placeholder="e.g., White New Rock Tank 106 (M-TANK106-C1)"
+            class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none"
+          />
+        </div>
+
+        <!-- Category & Status -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-zinc-300 mb-1">Category *</label>
+            <select id="field-category" class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none">
+              <option value="Footwear">Footwear</option>
+              <option value="Jackets">Jackets</option>
+              <option value="Denim">Denim</option>
+              <option value="Tops">Tops</option>
+              <option value="Accessories">Accessories</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-zinc-300 mb-1">Status *</label>
+            <select id="field-status" class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none">
+              <option value="Next Haul ($250)">Next Haul ($250)</option>
+              <option value="Warehouse / Transit">Warehouse / Transit</option>
+              <option value="Owned & Christmas">Owned & Christmas</option>
+              <option value="Wishlist">Wishlist</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Price USD, Retail USD, Weight -->
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-zinc-300 mb-1">Your Price ($)</label>
+            <input type="number" step="0.01" id="field-price" required placeholder="74.82" class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-zinc-300 mb-1">Retail Est. ($)</label>
+            <input type="number" step="0.01" id="field-retail" placeholder="365" class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-zinc-300 mb-1">Weight (g)</label>
+            <input type="number" id="field-weight" placeholder="1950" class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none" />
+          </div>
+        </div>
+
+        <!-- Size & Batch/Seller -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-zinc-300 mb-1">Size</label>
+            <input type="text" id="field-size" placeholder="e.g., EU 42 / M / 30x32" class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-zinc-300 mb-1">Batch / Source</label>
+            <input type="text" id="field-batch" placeholder="e.g., 1688 / Hipobuy / Vinted" class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none" />
+          </div>
+        </div>
+
+        <!-- Product Link -->
+        <div>
+          <label class="block text-xs font-semibold text-zinc-300 mb-1">Hipobuy / Taobao / Vinted Link</label>
+          <input type="url" id="field-link" placeholder="https://hipobuy.com/..." class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none" />
+        </div>
+
+        <!-- Notes -->
+        <div>
+          <label class="block text-xs font-semibold text-zinc-300 mb-1">Notes / Fit Details</label>
+          <textarea id="field-notes" rows="2" placeholder="Batch notes, styling combos, QC reminders..." class="w-full bg-obsidian border border-borderDark focus:border-crimson rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none"></textarea>
+        </div>
+
+        <!-- Modal Footer Actions -->
+        <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-borderDark">
+          <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-400 hover:text-white hover:bg-zinc-800 transition">
+            Cancel
+          </button>
+          <button type="submit" class="bg-crimson hover:bg-crimsonDark text-white text-xs font-semibold px-5 py-2 rounded-xl transition shadow-lg shadow-crimson/20">
+            Save Piece
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Custom Confirm Modal (Delete / Reset without browser alert/confirm) -->
+  <div id="confirm-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-card border border-borderDark rounded-2xl w-full max-w-sm p-5 shadow-2xl space-y-4">
+      <h3 id="confirm-title" class="font-display font-bold text-base text-white">Confirm Action</h3>
+      <p id="confirm-message" class="text-xs text-zinc-400 leading-relaxed">Are you sure?</p>
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button onclick="closeConfirmModal()" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-zinc-400 hover:bg-zinc-800 transition">Cancel</button>
+        <button id="confirm-action-btn" class="bg-crimson hover:bg-crimsonDark text-white text-xs font-semibold px-4 py-2 rounded-xl transition">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Exchange rate USD -> DKK
+    const DKK_RATE = 7.00;
+    const STORAGE_KEY = 'vault_archive_catalog_v1';
+
+    // Starter Pre-loaded Wardrobe & Haul Catalog
+    const defaultItems = [
+      {
+        id: 'item-1',
+        name: 'White New Rock Tank 106 (M-TANK106-C1)',
+        category: 'Footwear',
+        status: 'Next Haul ($250)',
+        priceUsd: 74.82,
+        retailUsd: 365,
+        weightG: 1950,
+        size: 'EU 42',
+        batch: '1688 (瑞贡盛鞋行)',
+        link: '',
+        image: '',
+        notes: 'Mid/high-tier leather batch on brown New Rock box; drop box for shipping.'
+      },
+      {
+        id: 'item-2',
+        name: 'Black New Rock Tank 106 (M-TANK106-C2)',
+        category: 'Footwear',
+        status: 'Next Haul ($250)',
+        priceUsd: 74.82,
+        retailUsd: 355,
+        weightG: 1950,
+        size: 'EU 42',
+        batch: '1688 (瑞贡盛鞋行)',
+        link: '',
+        image: '',
+        notes: 'All-black platform Tank 106 batch; drop shoebox before shipping.'
+      },
+      {
+        id: 'item-3',
+        name: 'Gray True Religion Super T Denim Jacket',
+        category: 'Jackets',
+        status: 'Next Haul ($250)',
+        priceUsd: 51.63,
+        retailUsd: 219,
+        weightG: 1050,
+        size: 'M',
+        batch: 'Taobao (TR牛仔裤)',
+        link: '',
+        image: '',
+        notes: 'Washed gray denim with black-filled horseshoes and white contrast rope stitching.'
+      },
+      {
+        id: 'item-4',
+        name: 'Black True Religion Super T Denim Jacket',
+        category: 'Jackets',
+        status: 'Next Haul ($250)',
+        priceUsd: 49.51,
+        retailUsd: 219,
+        weightG: 1050,
+        size: 'M',
+        batch: 'Taobao (TR牛仔裤)',
+        link: '',
+        image: '',
+        notes: 'Black washed denim Jimmy Super T trucker with white contrast stitching.'
+      },
+      {
+        id: 'item-5',
+        name: 'Black/Red True Religion Heavyweight Jeans',
+        category: 'Denim',
+        status: 'Warehouse / Transit',
+        priceUsd: 33.00,
+        retailUsd: 199,
+        weightG: 920,
+        size: '30/32',
+        batch: 'Hipobuy Warehouse',
+        link: '',
+        image: '',
+        notes: 'Heavyweight straight-leg denim with red contrast stitching.'
+      },
+      {
+        id: 'item-6',
+        name: 'Washed Gray True Religion Heavyweight Jeans',
+        category: 'Denim',
+        status: 'Warehouse / Transit',
+        priceUsd: 33.00,
+        retailUsd: 199,
+        weightG: 920,
+        size: '30/32',
+        batch: 'Hipobuy Warehouse',
+        link: '',
+        image: '',
+        notes: 'Pairs with Gray Super T Jacket or black outerwear.'
+      },
+      {
+        id: 'item-7',
+        name: 'Flared Black Balenciaga Denim',
+        category: 'Denim',
+        status: 'Warehouse / Transit',
+        priceUsd: 22.00,
+        retailUsd: 950,
+        weightG: 880,
+        size: 'M',
+        batch: 'Hipobuy Warehouse',
+        link: '',
+        image: '',
+        notes: 'Stacks over New Rock Tank 106s.'
+      },
+      {
+        id: 'item-8',
+        name: 'White/Red Flared True Religion Jeans',
+        category: 'Denim',
+        status: 'Warehouse / Transit',
+        priceUsd: 11.00,
+        retailUsd: 179,
+        weightG: 780,
+        size: '30',
+        batch: 'Hipobuy Warehouse',
+        link: '',
+        image: '',
+        notes: 'Budget flared pair for white New Rocks / DC Court Graffiks.'
+      },
+      {
+        id: 'item-9',
+        name: 'Blue True Religion Straight Jeans (Cn0520)',
+        category: 'Denim',
+        status: 'Warehouse / Transit',
+        priceUsd: 10.00,
+        retailUsd: 179,
+        weightG: 760,
+        size: '30',
+        batch: 'Hipobuy Warehouse',
+        link: '',
+        image: '',
+        notes: 'Awaiting warehouse QC photos.'
+      },
+      {
+        id: 'item-10',
+        name: 'Haunt-O-Holix Pumpkin Polo',
+        category: 'Tops',
+        status: 'Warehouse / Transit',
+        priceUsd: 18.00,
+        retailUsd: 95,
+        weightG: 320,
+        size: 'M',
+        batch: 'Hipobuy Warehouse',
+        link: '',
+        image: '',
+        notes: 'Orange/black Haunted Mound staple; awaiting QC.'
+      },
+      {
+        id: 'item-11',
+        name: 'Jack Skellington B.B. Simon Belt',
+        category: 'Accessories',
+        status: 'Warehouse / Transit',
+        priceUsd: 15.00,
+        retailUsd: 380,
+        weightG: 420,
+        size: '105cm',
+        batch: 'Hipobuy Warehouse',
+        link: '',
+        image: '',
+        notes: 'Statement rhinestone western belt.'
+      },
+      {
+        id: 'item-12',
+        name: 'Baroque & Iridescent Belts + Studded Cuffs',
+        category: 'Accessories',
+        status: 'Warehouse / Transit',
+        priceUsd: 16.00,
+        retailUsd: 140,
+        weightG: 550,
+        size: 'One Size',
+        batch: 'Hipobuy Warehouse',
+        link: '',
+        image: '',
+        notes: 'Croc-embossed studded cuffs and alternate western belts.'
+      },
+      {
+        id: 'item-13',
+        name: 'Armani Jeans Straight Denim',
+        category: 'Denim',
+        status: 'Owned & Christmas',
+        priceUsd: 35.00,
+        retailUsd: 180,
+        weightG: 750,
+        size: '30',
+        batch: 'Local Pickup',
+        link: '',
+        image: '',
+        notes: 'Picking up tomorrow; clean archive Y2K fit.'
+      },
+      {
+        id: 'item-14',
+        name: 'White/Black DC Court Graffik',
+        category: 'Footwear',
+        status: 'Owned & Christmas',
+        priceUsd: 85.00,
+        retailUsd: 85,
+        weightG: 1100,
+        size: 'EU 42',
+        batch: 'Reserved Christmas Gift',
+        link: '',
+        image: '',
+        notes: 'Classic chunky Y2K skate silhouette.'
+      },
+      {
+        id: 'item-15',
+        name: 'Faux-Leather Fur-Trimmed Bomber Jacket',
+        category: 'Jackets',
+        status: 'Owned & Christmas',
+        priceUsd: 75.00,
+        retailUsd: 120,
+        weightG: 1250,
+        size: 'M',
+        batch: 'Reserved Christmas Gift',
+        link: '',
+        image: '',
+        notes: 'Winter statement bomber.'
+      },
+      {
+        id: 'item-16',
+        name: 'Black Waffle-Knit Henley & Locs Shades',
+        category: 'Tops',
+        status: 'Owned & Christmas',
+        priceUsd: 40.00,
+        retailUsd: 65,
+        weightG: 450,
+        size: 'M',
+        batch: 'Reserved Christmas Gift',
+        link: '',
+        image: '',
+        notes: 'Base layering henley + dark Y2K wraparound shades.'
+      },
+      {
+        id: 'item-17',
+        name: 'Ed Hardy Embroidered Flame Work Boots',
+        category: 'Footwear',
+        status: 'Wishlist',
+        priceUsd: 95.00,
+        retailUsd: 150,
+        weightG: 1600,
+        size: 'EU 42',
+        batch: 'Wishlist Target',
+        link: '',
+        image: '',
+        notes: 'Black 6-inch work boot with white stitched flames.'
+      },
+      {
+        id: 'item-18',
+        name: "Robin's Jean / Rock Revival Contrast Stitch Denim",
+        category: 'Denim',
+        status: 'Wishlist',
+        priceUsd: 65.00,
+        retailUsd: 240,
+        weightG: 950,
+        size: '30',
+        batch: 'Vinted / Secondhand',
+        link: '',
+        image: '',
+        notes: 'Heavy crystal/flap pocket archive denim.'
+      }
+    ];
+
+    // App State
+    let items = [];
+    let activeStatus = 'All Pieces';
+    let activeCategory = 'All';
+    let searchQuery = '';
+    let currencyMode = 'BOTH'; // 'BOTH', 'USD', 'DKK'
+    let currentModalImageBase64 = '';
+
+    const STATUS_LIST = [
+      'All Pieces',
+      'Next Haul ($250)',
+      'Warehouse / Transit',
+      'Owned & Christmas',
+      'Wishlist'
+    ];
+
+    const CATEGORY_LIST = [
+      'All',
+      'Footwear',
+      'Jackets',
+      'Denim',
+      'Tops',
+      'Accessories'
+    ];
+
+    // Load items from localStorage or fall back to defaultItems
+    function loadItems() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            items = parsed;
+            return;
+          }
+        }
+      } catch (e) {
+        console.error('Failed to read localStorage:', e);
+      }
+      items = JSON.parse(JSON.stringify(defaultItems));
+      saveItemsToStorage();
+    }
+
+    function saveItemsToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      } catch (e) {
+        showToast('Storage almost full — try exporting a JSON backup.', 'error');
+      }
+    }
+
+    // Currency formatting helper
+    function formatPrice(usdVal) {
+      const usd = Number(usdVal) || 0;
+      const dkk = Math.round(usd * DKK_RATE);
+      if (currencyMode === 'USD') return `$${usd.toFixed(2)}`;
+      if (currencyMode === 'DKK') return `${dkk.toLocaleString('da-DK')} kr.`;
+      return `$${usd.toFixed(2)} <span class="text-zinc-500 font-normal text-xs">(${dkk} kr.)</span>`;
+    }
+
+    function cycleCurrency() {
+      const order = ['BOTH', 'USD', 'DKK'];
+      const labels = {
+        BOTH: 'USD + DKK',
+        USD: 'USD ($)',
+        DKK: 'DKK (kr.)'
+      };
+      const next = order[(order.indexOf(currencyMode) + 1) % order.length];
+      currencyMode = next;
+      document.getElementById('currency-label').textContent = labels[currencyMode];
+      updateStats();
+      renderGrid();
+    }
+
+    // Status Badge Colors
+    function getStatusBadgeClass(status) {
+      switch (status) {
+        case 'Next Haul ($250)':
+          return 'bg-crimson/15 text-rose-400 border-crimson/30';
+        case 'Warehouse / Transit':
+          return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+        case 'Owned & Christmas':
+          return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+        case 'Wishlist':
+          return 'bg-sky-500/15 text-sky-300 border-sky-500/30';
+        default:
+          return 'bg-zinc-800 text-zinc-300 border-zinc-700';
+      }
+    }
+
+    // Stylized SVG placeholder by Category when no photo is uploaded yet
+    function getCategoryPlaceholderSVG(category) {
+      const icons = {
+        Footwear: `<svg class="w-12 h-12 text-zinc-600" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A1.25 1.25 0 004.25 20h15.5A1.25 1.25 0 0021 18.75v-1.5c0-1.1-.78-2.05-1.86-2.25l-4.64-.85-2.5-3.65H8.5L6.5 14H4.25A1.25 1.25 0 003 15.25v1.25z"/></svg>`,
+        Jackets: `<svg class="w-12 h-12 text-zinc-600" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3l3 2 3-2 5 3-2 5v9a1 1 0 01-1 1H7a1 1 0 01-1-1v-9L4 6l5-3z"/></svg>`,
+        Denim: `<svg class="w-12 h-12 text-zinc-600" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3h10l1.5 18h-4.5L12 10l-2 11H5.5L7 3z"/></svg>`,
+        Tops: `<svg class="w-12 h-12 text-zinc-600" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 4l4 2 4-2 4 3-2 4h-2v9H8v-9H6L4 7l4-3z"/></svg>`,
+        Accessories: `<svg class="w-12 h-12 text-zinc-600" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="2"/><rect x="9" y="7" width="6" height="10" rx="1"/></svg>`
+      };
+      return icons[category] || icons.Footwear;
+    }
+
+    // Render Filter Tabs & Pills
+    function renderFilters() {
+      const statusContainer = document.getElementById('status-tabs');
+      statusContainer.innerHTML = STATUS_LIST.map(st => {
+        const count = st === 'All Pieces'
+          ? items.length
+          : items.filter(i => i.status === st).length;
+        const isActive = activeStatus === st;
+        return `
+          <button
+            onclick="setStatusFilter('${st}')"
+            class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold border transition flex items-center gap-2 ${
+              isActive
+                ? 'bg-crimson text-white border-crimson shadow-md shadow-crimson/20'
+                : 'bg-card text-zinc-400 border-borderDark hover:text-zinc-200 hover:bg-cardHover'
+            }"
+          >
+            <span>${st}</span>
+            <span class="px-1.5 py-0.5 rounded-md text-[10px] ${isActive ? 'bg-black/25 text-white' : 'bg-obsidian text-zinc-400'}">${count}</span>
+          </button>
+        `;
+      }).join('');
+
+      const catContainer = document.getElementById('category-pills');
+      catContainer.innerHTML = CATEGORY_LIST.map(cat => {
+        const isActive = activeCategory === cat;
+        return `
+          <button
+            onclick="setCategoryFilter('${cat}')"
+            class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium border transition ${
+              isActive
+                ? 'bg-zinc-200 text-obsidian border-zinc-200 font-semibold'
+                : 'bg-obsidian text-zinc-400 border-borderDark hover:text-zinc-200'
+            }"
+          >
+            ${cat}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function setStatusFilter(st) {
+      activeStatus = st;
+      renderFilters();
+      renderGrid();
+    }
+
+    function setCategoryFilter(cat) {
+      activeCategory = cat;
+      renderFilters();
+      renderGrid();
+    }
+
+    function resetFilters() {
+      activeStatus = 'All Pieces';
+      activeCategory = 'All';
+      searchQuery = '';
+      document.getElementById('search-input').value = '';
+      renderFilters();
+      renderGrid();
+    }
+
+    // Update Top Summary Cards
+    function updateStats() {
+      const nextHaulItems = items.filter(i => i.status === 'Next Haul ($250)');
+      const nextHaulUsd = nextHaulItems.reduce((sum, i) => sum + (Number(i.priceUsd) || 0), 0);
+      const nextHaulDkk = Math.round(nextHaulUsd * DKK_RATE);
+      const nextHaulWeightKg = (nextHaulItems.reduce((sum, i) => sum + (Number(i.weightG) || 0), 0) / 1000).toFixed(2);
+
+      // Retail savings across Next Haul + Warehouse items
+      const haulAndWarehouse = items.filter(i => i.status === 'Next Haul ($250)' || i.status === 'Warehouse / Transit');
+      const totalSavedUsd = haulAndWarehouse.reduce((sum, i) => {
+        const retail = Number(i.retailUsd) || 0;
+        const paid = Number(i.priceUsd) || 0;
+        return sum + Math.max(0, retail - paid);
+      }, 0);
+      const totalSavedDkk = Math.round(totalSavedUsd * DKK_RATE);
+
+      document.getElementById('stat-count').textContent = items.length;
+      document.getElementById('stat-nexthaul-price').textContent =
+        currencyMode === 'DKK' ? `${nextHaulDkk.toLocaleString('da-DK')} kr.` : `$${nextHaulUsd.toFixed(2)}`;
+      document.getElementById('stat-nexthaul-sub').textContent =
+        `${nextHaulDkk.toLocaleString('da-DK')} DKK • ${nextHaulItems.length} pieces`;
+      document.getElementById('stat-nexthaul-weight').textContent = `${nextHaulWeightKg} kg`;
+      document.getElementById('stat-saved').textContent =
+        currencyMode === 'DKK' ? `${totalSavedDkk.toLocaleString('da-DK')} kr.` : `$${Math.round(totalSavedUsd).toLocaleString()}`;
+      document.getElementById('stat-saved-sub').textContent =
+        `~${totalSavedDkk.toLocaleString('da-DK')} DKK saved vs. retail`;
+    }
+
+    // Render Product Cards
+    function renderGrid() {
+      const grid = document.getElementById('items-grid');
+      const emptyState = document.getElementById('empty-state');
+      const sortBy = document.getElementById('sort-select').value;
+
+      let filtered = items.filter(item => {
+        const matchesStatus = activeStatus === 'All Pieces' || item.status === activeStatus;
+        const matchesCat = activeCategory === 'All' || item.category === activeCategory;
+        const q = searchQuery.trim().toLowerCase();
+        const matchesQuery = !q || [item.name, item.batch, item.notes, item.category, item.size]
+          .some(field => (field || '').toLowerCase().includes(q));
+        return matchesStatus && matchesCat && matchesQuery;
+      });
+
+      if (sortBy === 'price-desc') filtered.sort((a, b) => (b.priceUsd || 0) - (a.priceUsd || 0));
+      if (sortBy === 'price-asc') filtered.sort((a, b) => (a.priceUsd || 0) - (b.priceUsd || 0));
+      if (sortBy === 'weight-desc') filtered.sort((a, b) => (b.weightG || 0) - (a.weightG || 0));
+      if (sortBy === 'savings-desc') {
+        filtered.sort((a, b) => ((b.retailUsd || 0) - (b.priceUsd || 0)) - ((a.retailUsd || 0) - (a.priceUsd || 0)));
+      }
+
+      document.getElementById('stat-filtered-note').textContent =
+        filtered.length === items.length ? 'total in vault' : `showing ${filtered.length}`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      grid.innerHTML = filtered.map(item => {
+        const hasImage = item.image && item.image.trim().length > 0;
+        const hasLink = item.link && item.link.trim().length > 0;
+        const savedUsd = Math.max(0, (Number(item.retailUsd) || 0) - (Number(item.priceUsd) || 0));
+
+        return `
+          <article class="group bg-card hover:bg-cardHover border border-borderDark hover:border-zinc-700 rounded-2xl overflow-hidden flex flex-col transition duration-200 shadow-lg shadow-black/20">
+            <!-- 1:1 Image Frame -->
+            <div class="relative aspect-square bg-[#0e0e12] border-b border-borderDark overflow-hidden">
+              ${
+                hasImage
+                  ? `<img src="${item.image}" alt="${escapeHtml(item.name)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                     <div class="hidden w-full h-full flex-col items-center justify-center p-4 text-center">
+                       ${getCategoryPlaceholderSVG(item.category)}
+                       <span class="text-[11px] text-zinc-500 mt-2">Image unavailable</span>
+                     </div>`
+                  : `<div class="w-full h-full flex flex-col items-center justify-center p-4 text-center bg-gradient-to-b from-[#131318] to-[#0b0b0e]">
+                       ${getCategoryPlaceholderSVG(item.category)}
+                       <button onclick="openModal('${item.id}')" class="mt-3 text-[11px] font-medium text-zinc-400 hover:text-white bg-zinc-800/80 hover:bg-crimson px-2.5 py-1 rounded-lg border border-zinc-700/80 transition">
+                         + Add QC / Photo
+                       </button>
+                     </div>`
+              }
+
+              <!-- Top Badges -->
+              <div class="absolute top-2.5 left-2.5 right-2.5 flex items-start justify-between gap-1.5 pointer-events-none">
+                <span class="px-2.5 py-1 rounded-lg text-[10px] font-semibold border backdrop-blur-md ${getStatusBadgeClass(item.status)}">
+                  ${escapeHtml(item.status)}
+                </span>
+                <span class="px-2 py-1 rounded-lg text-[10px] font-semibold bg-black/70 text-zinc-300 border border-white/10 backdrop-blur-md">
+                  ${escapeHtml(item.category)}
+                </span>
+              </div>
+
+              <!-- Bottom Weight / Savings Pill -->
+              <div class="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-[10px] pointer-events-none">
+                ${item.weightG ? `<span class="px-2 py-0.5 rounded-md bg-black/75 text-zinc-300 border border-white/10 backdrop-blur-sm">${item.weightG}g</span>` : '<span></span>'}
+                ${savedUsd > 10 ? `<span class="px-2 py-0.5 rounded-md bg-emerald-950/85 text-emerald-300 border border-emerald-500/30 backdrop-blur-sm">Save $${Math.round(savedUsd)}</span>` : ''}
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+              <div>
+                <h3 class="font-display font-bold text-sm sm:text-[15px] text-white leading-snug line-clamp-2">
+                  ${escapeHtml(item.name)}
+                </h3>
+
+                <!-- Metadata Chips -->
+                <div class="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-zinc-400">
+                  ${item.size ? `<span class="bg-obsidian px-2 py-0.5 rounded-md border border-borderDark text-zinc-300 font-medium">Size: ${escapeHtml(item.size)}</span>` : ''}
+                  ${item.batch ? `<span class="bg-obsidian px-2 py-0.5 rounded-md border border-borderDark truncate max-w-[160px]">${escapeHtml(item.batch)}</span>` : ''}
+                </div>
+
+                <!-- Notes -->
+                ${item.notes ? `<p class="mt-2.5 text-xs text-zinc-400 line-clamp-2 leading-relaxed">${escapeHtml(item.notes)}</p>` : ''}
+              </div>
+
+              <!-- Price & Action Row -->
+              <div class="pt-3 border-t border-borderDark/80 space-y-2.5">
+                <div class="flex items-baseline justify-between">
+                  <div class="font-display font-bold text-base text-white">
+                    ${formatPrice(item.priceUsd)}
+                  </div>
+                  ${item.retailUsd ? `<span class="text-[11px] text-zinc-500 line-through">Retail $${item.retailUsd}</span>` : ''}
+                </div>
+
+                <div class="flex items-center gap-2">
+                  ${
+                    hasLink
+                      ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer" class="flex-1 inline-flex items-center justify-center gap-1.5 bg-crimson hover:bg-crimsonDark text-white text-xs font-semibold py-2 px-3 rounded-xl transition">
+                           <span>Open Link</span>
+                           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                         </a>`
+                      : `<button onclick="openModal('${item.id}')" class="flex-1 inline-flex items-center justify-center gap-1.5 bg-zinc-800/90 hover:bg-zinc-700 text-zinc-300 text-xs font-medium py-2 px-3 rounded-xl border border-zinc-700/70 transition">
+                           <span>+ Add Link</span>
+                         </button>`
+                  }
+
+                  <button onclick="openModal('${item.id}')" title="Edit Piece" class="p-2 rounded-xl bg-obsidian hover:bg-zinc-800 text-zinc-400 hover:text-white border border-borderDark transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+
+                  <button onclick="confirmDelete('${item.id}')" title="Delete Piece" class="p-2 rounded-xl bg-obsidian hover:bg-rose-950/60 text-zinc-400 hover:text-rose-400 border border-borderDark transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Modal Open / Close / Save
+    function openModal(itemId = null) {
+      const modal = document.getElementById('piece-modal');
+      const form = document.getElementById('piece-form');
+      form.reset();
+      currentModalImageBase64 = '';
+
+      if (itemId) {
+        const item = items.find(i => i.id === itemId);
+        if (!item) return;
+        document.getElementById('modal-title').textContent = 'Edit Piece';
+        document.getElementById('field-id').value = item.id;
+        document.getElementById('field-name').value = item.name || '';
+        document.getElementById('field-category').value = item.category || 'Footwear';
+        document.getElementById('field-status').value = item.status || 'Next Haul ($250)';
+        document.getElementById('field-price').value = item.priceUsd ?? '';
+        document.getElementById('field-retail').value = item.retailUsd ?? '';
+        document.getElementById('field-weight').value = item.weightG ?? '';
+        document.getElementById('field-size').value = item.size || '';
+        document.getElementById('field-batch').value = item.batch || '';
+        document.getElementById('field-link').value = item.link || '';
+        document.getElementById('field-notes').value = item.notes || '';
+
+        if (item.image) {
+          if (item.image.startsWith('data:')) {
+            currentModalImageBase64 = item.image;
+          } else {
+            document.getElementById('field-image-url').value = item.image;
+          }
+          setModalPreview(item.image);
+        } else {
+          setModalPreview('');
+        }
+      } else {
+        document.getElementById('modal-title').textContent = 'Add New Piece';
+        document.getElementById('field-id').value = '';
+        if (activeStatus !== 'All Pieces') {
+          document.getElementById('field-status').value = activeStatus;
+        }
+        if (activeCategory !== 'All') {
+          document.getElementById('field-category').value = activeCategory;
+        }
+        setModalPreview('');
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('piece-modal').classList.add('hidden');
+    }
+
+    function setModalPreview(src) {
+      const box = document.getElementById('modal-img-preview');
+      if (src) {
+        box.innerHTML = `<img src="${src}" class="w-full h-full object-cover" />`;
+      } else {
+        box.innerHTML = 'No Photo';
+      }
+    }
+
+    function updatePreviewFromUrl(url) {
+      currentModalImageBase64 = '';
+      setModalPreview(url.trim());
+    }
+
+    // Compress uploaded screenshot/image via HTML5 Canvas so localStorage stays super light
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+          const MAX_DIM = 600;
+          let width = img.width;
+          let height = img.height;
+          if (width > height && width > MAX_DIM) {
+            height = Math.round((height * MAX_DIM) / width);
+            width = MAX_DIM;
+          } else if (height > MAX_DIM) {
+            width = Math.round((width * MAX_DIM) / height);
+            height = MAX_DIM;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.78);
+          currentModalImageBase64 = compressedDataUrl;
+          document.getElementById('field-image-url').value = '';
+          setModalPreview(compressedDataUrl);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function savePiece(event) {
+      event.preventDefault();
+      const id = document.getElementById('field-id').value;
+      const imageUrlInput = document.getElementById('field-image-url').value.trim();
+      const finalImage = currentModalImageBase64 || imageUrlInput;
+
+      const pieceData = {
+        id: id || 'item-' + Date.now(),
+        name: document.getElementById('field-name').value.trim(),
+        category: document.getElementById('field-category').value,
+        status: document.getElementById('field-status').value,
+        priceUsd: parseFloat(document.getElementById('field-price').value) || 0,
+        retailUsd: parseFloat(document.getElementById('field-retail').value) || 0,
+        weightG: parseInt(document.getElementById('field-weight').value, 10) || 0,
+        size: document.getElementById('field-size').value.trim(),
+        batch: document.getElementById('field-batch').value.trim(),
+        link: document.getElementById('field-link').value.trim(),
+        image: finalImage,
+        notes: document.getElementById('field-notes').value.trim()
+      };
+
+      if (id) {
+        const idx = items.findIndex(i => i.id === id);
+        if (idx !== -1) items[idx] = pieceData;
+        showToast('Piece updated.');
+      } else {
+        items.unshift(pieceData);
+        showToast('New piece added to vault.');
+      }
+
+      saveItemsToStorage();
+      renderFilters();
+      updateStats();
+      renderGrid();
+      closeModal();
+    }
+
+    // Custom Confirm Dialog (Delete & Reset)
+    function confirmDelete(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+      document.getElementById('confirm-title').textContent = 'Delete Piece?';
+      document.getElementById('confirm-message').textContent = `Remove "${item.name}" from your catalog?`;
+      const btn = document.getElementById('confirm-action-btn');
+      btn.onclick = () => {
+        items = items.filter(i => i.id !== itemId);
+        saveItemsToStorage();
+        renderFilters();
+        updateStats();
+        renderGrid();
+        closeConfirmModal();
+        showToast('Piece removed.');
+      };
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+
+    function openResetConfirm() {
+      toggleSyncMenu(false);
+      document.getElementById('confirm-title').textContent = 'Reset to Starter Catalog?';
+      document.getElementById('confirm-message').textContent = 'This will restore the original 18 pre-loaded items and overwrite custom edits.';
+      const btn = document.getElementById('confirm-action-btn');
+      btn.onclick = () => {
+        items = JSON.parse(JSON.stringify(defaultItems));
+        saveItemsToStorage();
+        renderFilters();
+        updateStats();
+        renderGrid();
+        closeConfirmModal();
+        showToast('Catalog reset to starter items.');
+      };
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirm-modal').classList.add('hidden');
+    }
+
+    // Sync Dropdown & JSON Export/Import
+    function toggleSyncMenu(forceState = null) {
+      const dd = document.getElementById('sync-dropdown');
+      if (forceState === false) {
+        dd.classList.add('hidden');
+      } else {
+        dd.classList.toggle('hidden');
+      }
+    }
+
+    function exportJSON() {
+      toggleSyncMenu(false);
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(items, null, 2));
+      const dlAnchor = document.createElement('a');
+      dlAnchor.setAttribute('href', dataStr);
+      dlAnchor.setAttribute('download', `vault-archive-backup-${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(dlAnchor);
+      dlAnchor.click();
+      dlAnchor.remove();
+      showToast('Backup JSON downloaded.');
+    }
+
+    function importJSON(event) {
+      toggleSyncMenu(false);
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (!Array.isArray(imported)) throw new Error('Invalid JSON structure');
+          items = imported;
+          saveItemsToStorage();
+          renderFilters();
+          updateStats();
+          renderGrid();
+          showToast(`Imported ${items.length} pieces!`);
+        } catch (err) {
+          showToast('Invalid backup file.', 'error');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    // Toast Feedback Helper
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const accent = type === 'error' ? 'border-rose-500/50 text-rose-200' : 'border-emerald-500/40 text-zinc-100';
+      toast.className = `bg-card border ${accent} px-4 py-2.5 rounded-xl shadow-2xl text-xs font-medium backdrop-blur-md transition-opacity duration-300`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 2600);
+    }
+
+    // Search Listener & Outside Click Handler
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      renderGrid();
+    });
+
+    document.addEventListener('click', (e) => {
+      const syncBtn = document.getElementById('sync-menu-btn');
+      const syncDd = document.getElementById('sync-dropdown');
+      if (syncBtn && syncDd && !syncBtn.contains(e.target) && !syncDd.contains(e.target)) {
+        syncDd.classList.add('hidden');
+      }
+    });
+
+    // Initialize App on Load
+    window.addEventListener('DOMContentLoaded', () => {
+      loadItems();
+      renderFilters();
+      updateStats();
+      renderGrid();
+    });
+  </script>
+</body>
+</html>
